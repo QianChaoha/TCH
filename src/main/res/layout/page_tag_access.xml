@@ -34,10 +34,11 @@
 		    <TextView
 				android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="3.7dip"
-	            android:layout_marginTop="7.5dip"
+				android:paddingLeft="3.7sp"
+				android:paddingTop="3.7sp"
+				android:paddingRight="3.7sp"
+				android:paddingBottom="7.5sp"
 	            android:gravity="center_vertical"
-	            android:paddingLeft="3.0dip"
 	            android:text="@string/tag_access_epc"
 	            android:textColor="#ff222222"
 	            android:textSize="9.5sp" />
@@ -65,6 +66,7 @@
 					android:layout_height="wrap_content"
 					android:paddingLeft="3.7sp"
 					android:paddingRight="3.7sp"
+					android:paddingBottom="3.7sp"
 					android:shrinkColumns="0"
 					android:stretchColumns="0" >
 					
@@ -100,50 +102,6 @@
 			</LinearLayout>
 			
 	    	<LinearLayout
-	            android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal" >
-	            
-				<TextView
-				    android:id="@+id/get"
-					android:layout_width="fill_parent"
-	            	android:layout_height="wrap_content"
-	            	android:layout_weight="1.0"
-					android:layout_marginLeft="15.0sp"
-					android:layout_marginTop="7.5sp"
-					android:layout_marginRight="15.0sp"
-					android:layout_marginBottom="7.5sp"
-					android:paddingTop="7.5sp"
-					android:paddingBottom="7.5sp"
-					android:gravity="center_horizontal"
-					android:background="@drawable/button_selector"
-					android:text="@string/get"
-					android:textColor="#ff222222"
-					android:textStyle="bold"
-					android:textSize="9.5sp"
-					android:clickable="true" />
-				
-				<TextView
-				    android:id="@+id/select"
-					android:layout_width="fill_parent"
-	            	android:layout_height="wrap_content"
-	            	android:layout_weight="1.0"
-					android:layout_marginLeft="15.0sp"
-					android:layout_marginTop="7.5sp"
-					android:layout_marginRight="15.0sp"
-					android:layout_marginBottom="7.5sp"
-					android:paddingTop="7.5sp"
-					android:paddingBottom="7.5sp"
-					android:gravity="center_horizontal"
-					android:background="@drawable/button_selector"
-					android:text="@string/select"
-					android:textColor="#ff222222"
-					android:textStyle="bold"
-					android:textSize="9.5sp"
-					android:clickable="true" />
-			</LinearLayout>
-			
-	    	<LinearLayout
 			    android:layout_width="fill_parent"
 				android:layout_height="1dip"
 				android:paddingLeft="3.7sp"
@@ -163,56 +121,58 @@
 		    
 	    	<RadioGroup
 	            android:id="@+id/group_access_area_type"
-	            android:layout_width="wrap_content"
+	            android:layout_width="match_parent"
+				android:layout_marginLeft="11sp"
+				android:layout_marginRight="11sp"
 	            android:layout_height="wrap_content"
 	            android:gravity="center"
 	            android:orientation="horizontal" >
 
 	            <RadioButton
 	                android:id="@+id/set_access_area_password"
-	                android:layout_width="wrap_content"
+	                android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
 	            	android:paddingBottom="3.7sp"
-	            	android:layout_marginLeft="3.7sp"
-	            	android:checked="true"
 	                android:text="@string/area_password"
 	                android:textColor="#ff222222"
 	                android:textSize="9.5sp" />
 	
 	            <RadioButton
 	                android:id="@+id/set_access_area_epc"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
 	            	android:paddingBottom="3.7sp"
-	                android:layout_marginLeft="3.7sp"
 	                android:text="@string/area_epc"
 	                android:textColor="#ff222222"
-	                android:textSize="9.5sp" />
+	                android:textSize="9.5sp"
+					android:checked="true"/>
 	            
 	            <RadioButton
 	                android:id="@+id/set_access_area_tid"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
 	            	android:paddingBottom="3.7sp"
-	                android:layout_marginLeft="3.7sp"
 	                android:text="@string/area_tid"
 	                android:textColor="#ff222222"
 	                android:textSize="9.5sp" />
 	            
 	           	<RadioButton
 	                android:id="@+id/set_access_area_user"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
 	            	android:paddingBottom="3.7sp"
-	                android:layout_marginLeft="3.7sp"
 	                android:text="@string/area_user"
 	                android:textColor="#ff222222"
 	                android:textSize="9.5sp" />
@@ -249,7 +209,8 @@
 		            android:gravity="center_vertical|center_horizontal"
 		            android:inputType="number"
 		            android:digits="0123456789abcdefABCDEF"
-		            android:textSize="12sp" />
+		            android:textSize="12sp"
+					android:text="00000000"/>
 			        
 		    </LinearLayout>
 		    
@@ -288,7 +249,8 @@
 		            android:background="@drawable/editbox_background"
 		            android:gravity="center_vertical|center_horizontal"
 		            android:inputType="number"
-		            android:textSize="12sp" />
+		            android:textSize="12sp"
+					android:text="0002"/>
 			        
 		    </LinearLayout>
 		    
@@ -323,7 +285,8 @@
 		            android:background="@drawable/editbox_background"
 		            android:gravity="center_vertical|center_horizontal"
 		            android:inputType="number"
-		            android:textSize="12sp" />
+		            android:textSize="12sp"
+					android:text="4"/>
 		    </LinearLayout>
 		    </LinearLayout>
 		    
@@ -496,7 +459,7 @@
         	
 	    	<RadioGroup
 	            android:id="@+id/group_lock_type"
-	            android:layout_width="wrap_content"
+	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:layout_marginLeft="3.7sp"
 	            android:gravity="center"
@@ -504,7 +467,8 @@
 
 	            <RadioButton
 	                android:id="@+id/set_lock_free"
-	                android:layout_width="wrap_content"
+	                android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
@@ -516,7 +480,8 @@
 	
 	            <RadioButton
 	                android:id="@+id/set_lock_lock"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
@@ -528,7 +493,8 @@
 	            
 	            <RadioButton
 	                android:id="@+id/set_lock_free_ever"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"
@@ -540,7 +506,8 @@
 	            
 	            <RadioButton
 	                android:id="@+id/set_lock_lock_ever"
-	                android:layout_width="wrap_content"
+					android:layout_width="0dp"
+					android:layout_weight="1"
 	                android:layout_height="wrap_content"
 	                android:button="@drawable/radio_button_selector"
 	                android:paddingTop="3.7sp"

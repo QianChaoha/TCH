@@ -1,15 +1,20 @@
 package com.uhf.uhf.tagpage;
 
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -44,7 +49,7 @@ public class PageTagAccess extends LinearLayout {
 	private LogList mLogList;
 	//fixed by lei.li 2016/11/09
 
-	private TextView mGet, mRead, mSelect, mWrite, mLock, mKill;
+	private TextView  mRead, mWrite, mLock, mKill;
 	
 	//private TextView mRefreshButton;
 
@@ -103,15 +108,11 @@ public class PageTagAccess extends LinearLayout {
 
 		
 		mLogList = (LogList) findViewById(R.id.log_list);
-		mGet = (TextView) findViewById(R.id.get);
 		mRead = (TextView) findViewById(R.id.read);
-		mSelect = (TextView) findViewById(R.id.select);
 		mWrite = (TextView) findViewById(R.id.write);
 		mLock = (TextView) findViewById(R.id.lock);
 		mKill = (TextView) findViewById(R.id.kill);
-		mGet.setOnClickListener(setAccessOnClickListener);
 		mRead.setOnClickListener(setAccessOnClickListener);
-		mSelect.setOnClickListener(setAccessOnClickListener);
 		mWrite.setOnClickListener(setAccessOnClickListener);
 		mLock.setOnClickListener(setAccessOnClickListener);
 		mKill.setOnClickListener(setAccessOnClickListener);
@@ -226,41 +227,6 @@ public class PageTagAccess extends LinearLayout {
 		@Override
 		public void onClick(View arg0) {
 			switch (arg0.getId()) {
-			case R.id.get:
-			{
-				mReader.getAccessEpcMatch(m_curReaderSetting.btReadId);
-				break;
-			}
-			case R.id.select:
-			{
-			if (mPos <= 0) {
-					mReader.cancelAccessEpcMatch(m_curReaderSetting.btReadId);
-				} else {
-					byte[] btAryEpc = null;
-					
-					try {
-						String[] result = StringTool.stringToStringArray(mAccessList.get(mPos).toUpperCase(), 2);
-						btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
-					} catch (Exception e) {
-						Toast.makeText(
-								mContext,
-								getResources().getString(R.string.param_unknown_error),
-								Toast.LENGTH_SHORT).show();
-						return;
-					}
-					
-					if (btAryEpc == null) {
-						Toast.makeText(
-								mContext,
-								getResources().getString(R.string.param_unknown_error),
-								Toast.LENGTH_SHORT).show();
-						return;
-					}
-					
-					mReader.setAccessEpcMatch(m_curReaderSetting.btReadId, (byte)(btAryEpc.length & 0xFF), btAryEpc);
-				}
-				break;
-			}
 			case R.id.read:
 			case R.id.write:
 			{
@@ -320,7 +286,12 @@ public class PageTagAccess extends LinearLayout {
                 	
                 	m_curOperateTagBuffer.clearBuffer();
 	                refreshList();
+	                // 1.标签id
+					// 2. 0x00:RESERVED, 0x01:EPC, 0x02:TID, 0x03:USER
+					// 3. 起始长度
+					// 4.密码
 	                mReader.readTag(m_curReaderSetting.btReadId, btMemBank, btWordAdd, btWordCnt, btAryPassWord);
+
                 } else {
                 	byte[] btAryData = null;
                 	String[] result = null;
@@ -468,6 +439,13 @@ public class PageTagAccess extends LinearLayout {
 					mTagAccessListText.setText(m_curOperateTagBuffer.strAccessEpcMatch);
 					break;
 				case CMD.READ_TAG:
+					if (m_curOperateTagBuffer.lsTagList!=null && m_curOperateTagBuffer.lsTagList.size()>0){
+						OperateTagBuffer.OperateTagMap operateTagMap = m_curOperateTagBuffer.lsTagList.get(0);
+						if (operateTagMap!=null){
+							//operateTagMap.strData   读取的数据
+							mDataEditText.setText(operateTagMap.strData);
+						}
+					}
 				case CMD.WRITE_TAG:
 				case CMD.LOCK_TAG:
 				case CMD.KILL_TAG:
@@ -493,6 +471,55 @@ public class PageTagAccess extends LinearLayout {
 		// TODO Auto-generated method stub
 		if (lbm != null)
 			lbm.unregisterReceiver(mRecv);
+	}
+
+
+
+	public boolean mInterceptTouchEvent = false;
+
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		//默认拦截
+		return mInterceptTouchEvent && super.onInterceptTouchEvent(ev);
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		if (getContext() instanceof Activity) {
+			Activity activity = (Activity) getContext();
+			switch (ev.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					View v = activity.getCurrentFocus();
+					if (isShouldHideInput(v, ev)) {
+
+						InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						if (imm != null) {
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						}
+					}
+					return super.dispatchTouchEvent(ev);
+
+			}
+			// 必不可少，否则所有的组件都不会有TouchEvent了
+			return super.dispatchTouchEvent(ev);
+		}
+		return super.dispatchTouchEvent(ev);
+	}
+
+	public boolean isShouldHideInput(View v, MotionEvent event) {
+		if (v != null && (v instanceof EditText)) {
+			int[] leftTop = {0, 0};
+			//获取输入框当前的location位置
+			v.getLocationInWindow(leftTop);
+			int left = leftTop[0];
+			int top = leftTop[1];
+			int bottom = top + v.getHeight();
+			int right = left + v.getWidth();
+			return !(event.getRawX() > left) || !(event.getRawX() < right)
+					|| !(event.getY() > top) || !(event.getY() < bottom);
+		}
+		return false;
 	}
 }
 

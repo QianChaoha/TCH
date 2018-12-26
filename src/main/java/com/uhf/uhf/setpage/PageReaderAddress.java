@@ -58,7 +58,7 @@ public class PageReaderAddress extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(layout.page_reader_address);
+		setContentView(R.layout.page_reader_address);
 		((UHFApplication) getApplication()).addActivity(this);
 		
 		try {

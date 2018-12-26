@@ -75,7 +75,7 @@ public class PageInventoryReal extends LinearLayout {
 		super(context, attrs);
 		mContext = context;
 		LayoutInflater.from(context)
-				.inflate(layout.page_inventory_real, this);
+				.inflate(R.layout.page_inventory_real, this);
 		try {
 			mReaderHelper = ReaderHelper.getDefaultHelper();
 			mReader = mReaderHelper.getReader();

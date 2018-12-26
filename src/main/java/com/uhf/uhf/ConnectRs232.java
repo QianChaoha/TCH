@@ -113,61 +113,8 @@ public class ConnectRs232 extends BaseActivity {
 			
 			@Override
 			public void onClick(View v) {
-				
-				if (mPortList.indexOf(mPortTextView.getText().toString()) >= 0)
-					mPosPort = mPortList.indexOf(mPortTextView.getText().toString());
-				
-				if (DEBUG)
-					Log.e(TAG, "test the value of mPosPort::" + mPosPort);
-				
-				if (mPosPort < 0) {
-					Toast.makeText(
-							getApplicationContext(),
-							getResources().getString(R.string.rs232_error),
-							Toast.LENGTH_SHORT).show();
-					return ;
-				}
-				
-				try {
-				
-					mSerialPort = new SerialPort(new File(entryValues[mPosPort]), baud, 0);
-					
-					if (DEBUG)
-						Log.e(TAG,"ttys1 value :::" + entryValues[mPosPort]);
-					
-					try {
-						mReaderHelper = ReaderHelper.getDefaultHelper();
-						mReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
-					} catch (Exception e) {
-						e.printStackTrace();
-						
-						return ;
-					}
-					if (!ModuleManager.newInstance().setUHFStatus(true)) {
-						throw new RuntimeException("UHF RFID power on failure,may you open in other" +
-								" Process and do not exit it");
-					}
 
-					Intent intent;
-					intent = new Intent().setClass(ConnectRs232.this, MainActivity.class);
-					startActivity(intent);
-					//finish();
-				} catch (SecurityException e) {
-					Toast.makeText(
-							getApplicationContext(),
-							getResources().getString(R.string.error_security),
-							Toast.LENGTH_SHORT).show();
-				} catch (IOException e) {
-					Toast.makeText(
-							getApplicationContext(),
-							getResources().getString(R.string.error_unknown),
-							Toast.LENGTH_SHORT).show();
-				} catch (InvalidParameterException e) {
-					Toast.makeText(
-							getApplicationContext(),
-							getResources().getString(R.string.error_configuration),
-							Toast.LENGTH_SHORT).show();
-				}
+				connect();
 			}
 		});
 		
@@ -189,8 +136,69 @@ public class ConnectRs232 extends BaseActivity {
 				setPortText(pos);
 			}
 		});
+
+
+
+		connect();
 	}
-	
+
+	private void connect() {
+		if (mPortList.indexOf(mPortTextView.getText().toString()) >= 0)
+            mPosPort = mPortList.indexOf(mPortTextView.getText().toString());
+
+		if (DEBUG)
+            Log.e(TAG, "test the value of mPosPort::" + mPosPort);
+
+		if (mPosPort < 0) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    getResources().getString(R.string.rs232_error),
+                    Toast.LENGTH_SHORT).show();
+            return ;
+        }
+
+		try {
+
+            mSerialPort = new SerialPort(new File(entryValues[mPosPort]), baud, 0);
+
+            if (DEBUG)
+                Log.e(TAG,"ttys1 value :::" + entryValues[mPosPort]);
+
+            try {
+                mReaderHelper = ReaderHelper.getDefaultHelper();
+                mReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                return ;
+            }
+            if (!ModuleManager.newInstance().setUHFStatus(true)) {
+                throw new RuntimeException("UHF RFID power on failure,may you open in other" +
+                        " Process and do not exit it");
+            }
+
+            Intent intent;
+            intent = new Intent().setClass(ConnectRs232.this, MainActivity.class);
+            startActivity(intent);
+            //finish();
+        } catch (SecurityException e) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    getResources().getString(R.string.error_security),
+                    Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    getResources().getString(R.string.error_unknown),
+                    Toast.LENGTH_SHORT).show();
+        } catch (InvalidParameterException e) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    getResources().getString(R.string.error_configuration),
+                    Toast.LENGTH_SHORT).show();
+        }
+	}
+
 	private void showPortSpinWindow() {
 		mSpinerPort.setWidth(mDropPort.getWidth());
 		mSpinerPort.showAsDropDown(mDropPort);
