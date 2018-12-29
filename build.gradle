@@ -7,12 +7,17 @@ android {
     defaultConfig {
         applicationId "com.uhf.uhf"
         minSdkVersion 19
-        targetSdkVersion 24
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName","UHFDemoN")
         multiDexEnabled true
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
     }
     buildTypes {
         release {
@@ -28,12 +33,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation rootProject.ext.dependencies["appcompat-v7"]
-    testCompile 'junit:junit:4.12'
-    compile files('src/main/libs/jxl.jar')
-    compile files('src/main/libs/Serialport-module.jar')
+    implementation files('src/main/libs/jxl.jar')
+    implementation files('src/main/libs/Serialport-module.jar')
+    implementation project(':personal:baseLib')
+    implementation 'com.qmuiteam:qmui:1.1.3'
+    implementation 'com.squareup.okhttp:okhttp:2.7.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.jakewharton:butterknife:7.0.1'
+    implementation 'com.yanzhenjie:permission:2.0.0-rc12'
+
 }

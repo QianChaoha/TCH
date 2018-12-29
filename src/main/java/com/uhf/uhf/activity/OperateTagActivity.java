@@ -1,25 +1,23 @@
-package com.uhf.uhf.tagpage;
+package com.uhf.uhf.activity;
 
-
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.baselib.base.BaseActivity;
 import com.reader.base.CMD;
 import com.reader.base.ERROR;
 import com.reader.base.ReaderBase;
@@ -33,21 +31,26 @@ import com.uhf.uhf.HexEditTextBox;
 import com.uhf.uhf.LogList;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagAccessList;
-import com.uhf.uhf.spiner.AbstractSpinerAdapter.IOnItemSelectListener;
+import com.uhf.uhf.spiner.AbstractSpinerAdapter;
 import com.uhf.uhf.spiner.SpinerPopWindow;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-
-public class PageTagAccess extends LinearLayout {
-
+/**
+ * Description:
+ * Data: 2018/12/28
+ *
+ * @author: cqian
+ */
+public class OperateTagActivity extends BaseActivity {
     //fixed by lei.li 2016/11/09
     //private LogList mLogList;
     private LogList mLogList;
     //fixed by lei.li 2016/11/09
 
-    private TextView mGet, mRead, mSelect, mWrite, mLock, mKill;
+    private TextView mStartStop, mRead, mSelect, mWrite, mLock, mKill;
 
     //private TextView mRefreshButton;
 
@@ -83,11 +86,51 @@ public class PageTagAccess extends LinearLayout {
     private LocalBroadcastManager lbm;
 
     private Context mContext;
+    private boolean bTmpInventoryFlag = true;
+    private String mStrRepeat = "1";
+    private Handler mHandler = new Handler();
+    private Handler mLoopHandler = new Handler();
+    private Runnable mLoopRunnable = new Runnable() {
+        public void run() {
+            /*
+             * byte btWorkAntenna =
+             * m_curInventoryBuffer.lAntenna.get(m_curInventoryBuffer
+             * .nIndexAntenna); if (btWorkAntenna < 0) btWorkAntenna = 0;
+             * mReader.setWorkAntenna(m_curReaderSetting.btReadId,
+             * btWorkAntenna);
+             */
+            mReaderHelper.runLoopInventroy();
+            mLoopHandler.postDelayed(this, 2000);
+        }
+    };
+    private Handler mUpdateViewHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            refreshText();
+            refreshList();
+        }
+    };
 
-    public PageTagAccess(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
-        LayoutInflater.from(context).inflate(R.layout.page_tag_access, this);
+    private Runnable mRefreshRunnable = new Runnable() {
+        public void run() {
+            refreshList();
+            mHandler.postDelayed(this, 2000);
+        }
+    };
+
+    public static void startOperateTagActivity(Context context) {
+        Intent intent = new Intent(context, OperateTagActivity.class);
+        context.startActivity(intent);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_operate_tag;
+    }
+
+    @Override
+    protected void initView() {
+        mContext = this;
 
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
@@ -106,13 +149,13 @@ public class PageTagAccess extends LinearLayout {
 
 
         mLogList = (LogList) findViewById(R.id.log_list);
-        mGet = (TextView) findViewById(R.id.get);
+        mStartStop = (TextView) findViewById(R.id.get);
         mRead = (TextView) findViewById(R.id.read);
         mSelect = (TextView) findViewById(R.id.select);
         mWrite = (TextView) findViewById(R.id.write);
         mLock = (TextView) findViewById(R.id.lock);
         mKill = (TextView) findViewById(R.id.kill);
-        mGet.setOnClickListener(setAccessOnClickListener);
+        mStartStop.setOnClickListener(setAccessOnClickListener);
         mRead.setOnClickListener(setAccessOnClickListener);
         mSelect.setOnClickListener(setAccessOnClickListener);
         mWrite.setOnClickListener(setAccessOnClickListener);
@@ -140,9 +183,11 @@ public class PageTagAccess extends LinearLayout {
         IntentFilter itent = new IntentFilter();
         itent.addAction(ReaderHelper.BROADCAST_WRITE_LOG);
         itent.addAction(ReaderHelper.BROADCAST_REFRESH_OPERATE_TAG);
+        itent.addAction(ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL);
+
         lbm.registerReceiver(mRecv, itent);
 
-        mDropDownRow.setOnClickListener(new OnClickListener() {
+        mDropDownRow.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showSpinWindow();
             }
@@ -156,21 +201,23 @@ public class PageTagAccess extends LinearLayout {
 
         mSpinerPopWindow = new SpinerPopWindow(mContext);
         mSpinerPopWindow.refreshData(mAccessList, 0);
-        mSpinerPopWindow.setItemListener(new IOnItemSelectListener() {
+        mSpinerPopWindow.setItemListener(new AbstractSpinerAdapter.IOnItemSelectListener() {
             public void onItemClick(int pos) {
                 setAccessSelectText(pos);
             }
         });
 
-        updateView();
+        //updateView();
 
-//		mRefreshButton = (TextView) findViewById(R.id.refresh);
-//		mRefreshButton.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View arg0) {
-//				refresh();
-//			}
-//		});
+    }
+
+    @Override
+    protected void setViewData() {
+    }
+
+    @Override
+    protected void getData() {
+
     }
 
     public void refresh() {
@@ -224,41 +271,120 @@ public class PageTagAccess extends LinearLayout {
         setAccessSelectText(mPos);
     }
 
-    private OnClickListener setAccessOnClickListener = new OnClickListener() {
+    private void startstop() {
+        bTmpInventoryFlag = false;
+
+        m_curInventoryBuffer.clearInventoryPar();
+
+        m_curInventoryBuffer.lAntenna.add((byte) 0x00);
+
+        if (m_curInventoryBuffer.lAntenna.size() <= 0) {
+            Toast.makeText(mContext,
+                    getResources().getString(R.string.antenna_empty),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        m_curInventoryBuffer.bLoopInventoryReal = true;
+        m_curInventoryBuffer.btRepeat = 0;
+
+        if (mStrRepeat == null || mStrRepeat.length() <= 0) {
+            Toast.makeText(mContext,
+                    getResources().getString(R.string.repeat_empty),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        m_curInventoryBuffer.btRepeat = (byte) Integer.parseInt(mStrRepeat);
+
+        if ((m_curInventoryBuffer.btRepeat & 0xFF) <= 0) {
+            Toast.makeText(mContext,
+                    getResources().getString(R.string.repeat_min),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+//        if (mCbRealSet.isChecked() && mCbRealSession.isChecked()) {
+//            m_curInventoryBuffer.bLoopCustomizedSession = true;
+//            m_curInventoryBuffer.btSession = (byte) (mPos1 & 0xFF);
+//            m_curInventoryBuffer.btTarget = (byte) (mPos2 & 0xFF);
+//        } else {
+        m_curInventoryBuffer.bLoopCustomizedSession = false;
+        // }
+
+        {
+            if (!mStartStop.getText().toString()
+                    .equals(getResources().getString(R.string.start_inventory))) {
+                refreshText();
+                mReaderHelper.setInventoryFlag(false);
+                m_curInventoryBuffer.bLoopInventoryReal = false;
+
+                // mReaderHelper.clearInventoryTotal();
+                // Log.e("zheliyelaidaol", "BBBBBBBBBBBBBBBBBBBBBBB");
+                // Log.e("flaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaag",mStartStop.getText().toString());
+
+                refreshStartStop(false);
+                mLoopHandler.removeCallbacks(mLoopRunnable);
+                mHandler.removeCallbacks(mRefreshRunnable);
+                refreshList();
+                return;
+            } else {
+                refreshStartStop(true);
+                // Log.e("flaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaag",mStartStop.getText().toString());
+
+                // start_add by lei.li 2016/11/04
+                // mReaderHelper.setInventoryFlag(true);
+                // end_add by lei.li 2016/11/04
+            }
+        }
+
+        // start_fixed by lei.li 2016/11/04 problem
+        // m_curInventoryBuffer.clearInventoryRealResult();
+        mReaderHelper.setInventoryFlag(true);
+        // end_fixed by lei.li 2016/11/04
+
+        mReaderHelper.clearInventoryTotal();
+        refreshText();
+
+        byte btWorkAntenna = m_curInventoryBuffer.lAntenna
+                .get(m_curInventoryBuffer.nIndexAntenna);
+        if (btWorkAntenna < 0)
+            btWorkAntenna = 0;
+        // mReader.setWorkAntenna(m_curReaderSetting.btReadId, btWorkAntenna);
+        mReaderHelper.runLoopInventroy();
+        m_curReaderSetting.btWorkAntenna = btWorkAntenna;
+        refreshStartStop(true);
+        mLoopHandler.removeCallbacks(mLoopRunnable);
+        mLoopHandler.postDelayed(mLoopRunnable, 2000);
+        mHandler.removeCallbacks(mRefreshRunnable);
+        mHandler.postDelayed(mRefreshRunnable, 2000);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void refreshStartStop(boolean start) {
+        if (start) {
+            mStartStop.setBackgroundDrawable(getResources().getDrawable(
+                    R.drawable.button_disenabled_background));
+            mStartStop.setText(getResources()
+                    .getString(R.string.stop_inventory));
+        } else {
+            mStartStop.setBackgroundDrawable(getResources().getDrawable(
+                    R.drawable.button_background));
+            mStartStop.setText(getResources().getString(
+                    R.string.start_inventory));
+        }
+    }
+
+    private View.OnClickListener setAccessOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
             switch (arg0.getId()) {
                 case R.id.get: {
-                    mReader.getAccessEpcMatch(m_curReaderSetting.btReadId);
+                    startstop();
                     break;
                 }
                 case R.id.select: {
-                    if (mPos <= 0) {
-                        mReader.cancelAccessEpcMatch(m_curReaderSetting.btReadId);
-                    } else {
-                        byte[] btAryEpc = null;
-
-                        try {
-                            String[] result = StringTool.stringToStringArray(mAccessList.get(mPos).toUpperCase(), 2);
-                            btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
-                        } catch (Exception e) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_unknown_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if (btAryEpc == null) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_unknown_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        mReader.setAccessEpcMatch(m_curReaderSetting.btReadId, (byte) (btAryEpc.length & 0xFF), btAryEpc);
-                    }
+                    mReader.getAccessEpcMatch(m_curReaderSetting.btReadId);
                     break;
                 }
                 case R.id.read:
@@ -486,6 +612,78 @@ public class PageTagAccess extends LinearLayout {
                 }
             } else if (intent.getAction().equals(ReaderHelper.BROADCAST_WRITE_LOG)) {
                 mLogList.writeLog((String) intent.getStringExtra("log"), intent.getIntExtra("type", ERROR.SUCCESS));
+            } else if (intent.getAction().equals(
+                    ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL)) {
+                byte btCmd = intent.getByteExtra("cmd", (byte) 0x00);
+                switch (btCmd) {
+                    case CMD.REAL_TIME_INVENTORY:
+                    case CMD.CUSTOMIZED_SESSION_TARGET_INVENTORY:
+                        // if (new Date().getTime() - mRefreshTime > 2000) {
+                        // refreshList();
+                        // mRefreshTime = new Date().getTime();
+                        // }
+                        // add by lei.li 2016/11/04
+                        // refreshStartStop(true);
+                        // add by lei.li 2016/11/04
+                        // Log.e("zhebian", "?????????????????????????????")
+                        // add by lei.li 2016/11/14
+                        if (!mReaderHelper.getInventoryFlag()) {
+                            if (!bTmpInventoryFlag) {
+                                bTmpInventoryFlag = true;
+                                mHandler.removeCallbacks(mRefreshRunnable);
+                                mHandler.postDelayed(mRefreshRunnable, 2000);
+
+                                // rm by lei.li 2016/11/04
+                                // m_curInventoryBuffer.clearInventoryRealResult();
+                                // mReaderHelper.clearInventoryTotal();
+                                // Log.e("zhebian",
+                                // "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            }
+                        }
+                        mUpdateViewHandler.sendEmptyMessage(0);
+                        // add by lei.li 2016/11/14
+                        //refreshList();
+                        // add by lei.li 2016/11/14
+
+                        mHandler.removeCallbacks(mRefreshRunnable);
+                        mHandler.postDelayed(mRefreshRunnable, 2000);
+                        // add by lei.li 2016/11/14
+                        mLoopHandler.removeCallbacks(mLoopRunnable);
+                        mLoopHandler.postDelayed(mLoopRunnable, 2000);
+                        //refreshText();
+                        break;
+                    case ReaderHelper.INVENTORY_ERR:
+                    case ReaderHelper.INVENTORY_ERR_END:
+                    case ReaderHelper.INVENTORY_END:
+                        // add by lei.li have some problem why it was annotation
+                        // refreshList();
+                        //refreshList();
+                        // add by lei.li
+                        // add by lei.li 2016/11/
+                        if (mReaderHelper.getInventoryFlag() /* || bTmpInventoryFlag */) {
+                            mLoopHandler.removeCallbacks(mLoopRunnable);
+                            mLoopHandler.postDelayed(mLoopRunnable, 2000);
+
+                        } else {
+                            mLoopHandler.removeCallbacks(mLoopRunnable);
+                            // add by lei.li 2016/11/14
+                            mHandler.removeCallbacks(mRefreshRunnable);
+                            // add by lei.li 2016/11/14
+                        }
+
+                        // start_add by lei.li 2016/11/04
+                        // refreshStartStop(false);
+                        // end_add by lei.li 2016/11/04
+                        // start_add by lei.li 2016/11/04
+                        //refreshText(); // fixed by lei.li 2016/11/04
+                        mUpdateViewHandler.sendEmptyMessage(0);
+                        break;
+                }
+
+            } else if (intent.getAction().equals(
+                    ReaderHelper.BROADCAST_WRITE_LOG)) {
+                mLogList.writeLog((String) intent.getStringExtra("log"),
+                        intent.getIntExtra("type", ERROR.SUCCESS));
             }
         }
     };
@@ -508,31 +706,21 @@ public class PageTagAccess extends LinearLayout {
 
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        //默认拦截
-        return mInterceptTouchEvent && super.onInterceptTouchEvent(ev);
-    }
-
-    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (getContext() instanceof Activity) {
-            Activity activity = (Activity) getContext();
-            switch (ev.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    View v = activity.getCurrentFocus();
-                    if (isShouldHideInput(v, ev)) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                View v = getCurrentFocus();
+                if (isShouldHideInput(v, ev)) {
 
-                        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (imm != null) {
-                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                        }
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                     }
-                    return super.dispatchTouchEvent(ev);
+                }
+                return super.dispatchTouchEvent(ev);
 
-            }
-            // 必不可少，否则所有的组件都不会有TouchEvent了
-            return super.dispatchTouchEvent(ev);
         }
+        // 必不可少，否则所有的组件都不会有TouchEvent了
         return super.dispatchTouchEvent(ev);
     }
 
@@ -550,5 +738,5 @@ public class PageTagAccess extends LinearLayout {
         }
         return false;
     }
-}
 
+}

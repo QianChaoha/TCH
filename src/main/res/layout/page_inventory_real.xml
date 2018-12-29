@@ -279,20 +279,7 @@
 			         	android:textStyle="bold"
 			         	android:textColor="#0BBBF7"
 			         	android:textSize="20.0sp" />
-					<TextView
-					    android:id="@+id/tags_count_text"
-						android:layout_width="0dp"
-			         	android:layout_height="wrap_content"
-			         	android:layout_weight="2.0"
-			         	android:layout_marginRight="3.7sp"
-			         	android:paddingTop="7.5sp"
-			         	android:paddingBottom="7.5sp"
-			    	    android:gravity="center_vertical|center_horizontal"
-			    	    android:background="@color/transparent_background"
-			         	android:text="0"
-					    android:textStyle="bold"
-					    android:textColor="#0BBBF7"
-					    android:textSize="20.0sp" />
+
 					<TextView
 					    android:layout_width="0dp"
 			         	android:layout_height="wrap_content"
@@ -548,4 +535,19 @@
 	</ScrollView>
 </RelativeLayout>
 </LinearLayout>
+
+	<TextView
+		android:id="@+id/tags_count_text"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginRight="3.7sp"
+		android:layout_weight="2.0"
+		android:background="@color/transparent_background"
+		android:gravity="center_vertical|center_horizontal"
+		android:paddingBottom="7.5sp"
+		android:paddingTop="7.5sp"
+		android:text="0"
+		android:textColor="#0BBBF7"
+		android:textSize="20.0sp"
+		android:textStyle="bold" />
 </LinearLayout>
