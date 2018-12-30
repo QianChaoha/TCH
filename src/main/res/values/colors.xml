@@ -3,8 +3,10 @@
     <color name="transparent_background_button">#11000000</color>
     <color name="transparent_background">#ffffffff</color>
     <color name="light_blue">#0bbbf7</color>
+    <color name="common_color">#1B88EE</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="border_color">#D3D3D3</color>
 </resources>

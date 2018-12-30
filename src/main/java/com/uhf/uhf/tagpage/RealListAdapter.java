@@ -64,7 +64,7 @@ public class RealListAdapter extends BaseAdapter {
 		ListItemView  listItemView = null;
 		if (convertView == null) {
 			listItemView = new ListItemView();
-			convertView = mInflater.inflate(layout.tag_real_list_item, null);
+			convertView = mInflater.inflate(R.layout.tag_real_list_item, null);
 			listItemView.mIdText = (TextView)convertView.findViewById(id.id_text);
 			listItemView.mEpcText = (TextView)convertView.findViewById(id.epc_text);
 			

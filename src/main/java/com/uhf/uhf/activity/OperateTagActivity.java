@@ -31,6 +31,7 @@ import com.uhf.uhf.HexEditTextBox;
 import com.uhf.uhf.LogList;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagAccessList;
+import com.uhf.uhf.TagRealList;
 import com.uhf.uhf.spiner.AbstractSpinerAdapter;
 import com.uhf.uhf.spiner.SpinerPopWindow;
 
@@ -50,7 +51,7 @@ public class OperateTagActivity extends BaseActivity {
     private LogList mLogList;
     //fixed by lei.li 2016/11/09
 
-    private TextView mStartStop, mRead, mSelect, mWrite, mLock, mKill;
+    private TextView mStartStop, mRead, mSelect, mWrite;
 
     //private TextView mRefreshButton;
 
@@ -68,10 +69,9 @@ public class OperateTagActivity extends BaseActivity {
     private HexEditTextBox mKillPasswordEditText;
 
     private RadioGroup mGroupAccessAreaType;
-    private RadioGroup mGroupLockAreaType;
     private RadioGroup mGroupLockType;
 
-    private TagAccessList mTagAccessList;
+    private TagRealList mTagAccessList;
 
     private ReaderHelper mReaderHelper;
     private ReaderBase mReader;
@@ -92,13 +92,6 @@ public class OperateTagActivity extends BaseActivity {
     private Handler mLoopHandler = new Handler();
     private Runnable mLoopRunnable = new Runnable() {
         public void run() {
-            /*
-             * byte btWorkAntenna =
-             * m_curInventoryBuffer.lAntenna.get(m_curInventoryBuffer
-             * .nIndexAntenna); if (btWorkAntenna < 0) btWorkAntenna = 0;
-             * mReader.setWorkAntenna(m_curReaderSetting.btReadId,
-             * btWorkAntenna);
-             */
             mReaderHelper.runLoopInventroy();
             mLoopHandler.postDelayed(this, 2000);
         }
@@ -153,14 +146,10 @@ public class OperateTagActivity extends BaseActivity {
         mRead = (TextView) findViewById(R.id.read);
         mSelect = (TextView) findViewById(R.id.select);
         mWrite = (TextView) findViewById(R.id.write);
-        mLock = (TextView) findViewById(R.id.lock);
-        mKill = (TextView) findViewById(R.id.kill);
         mStartStop.setOnClickListener(setAccessOnClickListener);
         mRead.setOnClickListener(setAccessOnClickListener);
         mSelect.setOnClickListener(setAccessOnClickListener);
         mWrite.setOnClickListener(setAccessOnClickListener);
-        mLock.setOnClickListener(setAccessOnClickListener);
-        mKill.setOnClickListener(setAccessOnClickListener);
 
         mPasswordEditText = (HexEditTextBox) findViewById(R.id.password_text);
         mStartAddrEditText = (EditText) findViewById(R.id.start_addr_text);
@@ -170,13 +159,12 @@ public class OperateTagActivity extends BaseActivity {
         mKillPasswordEditText = (HexEditTextBox) findViewById(R.id.kill_password_text);
 
         mGroupAccessAreaType = (RadioGroup) findViewById(R.id.group_access_area_type);
-        mGroupLockAreaType = (RadioGroup) findViewById(R.id.group_lock_area_type);
         mGroupLockType = (RadioGroup) findViewById(R.id.group_lock_type);
 
         mTagAccessListText = (TextView) findViewById(R.id.tag_access_list_text);
         mDropDownRow = (TableRow) findViewById(R.id.table_row_tag_access_list);
 
-        mTagAccessList = (TagAccessList) findViewById(R.id.tag_access_list);
+        mTagAccessList = (TagRealList) findViewById(R.id.tag_access_list);
 
         lbm = LocalBroadcastManager.getInstance(mContext);
 
@@ -207,8 +195,6 @@ public class OperateTagActivity extends BaseActivity {
             }
         });
 
-        //updateView();
-
     }
 
     @Override
@@ -231,8 +217,7 @@ public class OperateTagActivity extends BaseActivity {
         mLockPasswordEditText.setText("");
         mKillPasswordEditText.setText("");
 
-        mGroupAccessAreaType.check(R.id.set_access_area_password);
-        mGroupLockAreaType.check(R.id.set_lock_area_access_password);
+        mGroupAccessAreaType.check(R.id.set_access_area_epc);
         mGroupLockType.check(R.id.set_lock_free);
 
         m_curOperateTagBuffer.clearBuffer();
@@ -384,7 +369,32 @@ public class OperateTagActivity extends BaseActivity {
                     break;
                 }
                 case R.id.select: {
-                    mReader.getAccessEpcMatch(m_curReaderSetting.btReadId);
+                    if (mPos <= 0) {
+                        mReader.cancelAccessEpcMatch(m_curReaderSetting.btReadId);
+                    } else {
+                        byte[] btAryEpc = null;
+
+                        try {
+                            String[] result = StringTool.stringToStringArray(mAccessList.get(mPos).toUpperCase(), 2);
+                            btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
+                        } catch (Exception e) {
+                            Toast.makeText(
+                                    mContext,
+                                    getResources().getString(R.string.param_unknown_error),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (btAryEpc == null) {
+                            Toast.makeText(
+                                    mContext,
+                                    getResources().getString(R.string.param_unknown_error),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        mReader.setAccessEpcMatch(m_curReaderSetting.btReadId, (byte) (btAryEpc.length & 0xFF), btAryEpc);
+                    }
                     break;
                 }
                 case R.id.read:
@@ -393,9 +403,10 @@ public class OperateTagActivity extends BaseActivity {
                     byte btWordAdd = 0x00;
                     byte btWordCnt = 0x00;
                     byte[] btAryPassWord = null;
-                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_password) {
-                        btMemBank = 0x00;
-                    } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_epc) {
+//                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_password) {
+//                        btMemBank = 0x00;
+//                    } else
+                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_epc) {
                         btMemBank = 0x01;
                     } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_tid) {
                         btMemBank = 0x02;
@@ -491,83 +502,6 @@ public class OperateTagActivity extends BaseActivity {
 
                     break;
                 }
-                case R.id.lock: {
-                    byte btMemBank = 0x00;
-                    byte btLockType = 0x00;
-                    byte[] btAryPassWord = null;
-                    if (mGroupLockAreaType.getCheckedRadioButtonId() == R.id.set_lock_area_access_password) {
-                        btMemBank = 0x04;
-                    } else if (mGroupLockAreaType.getCheckedRadioButtonId() == R.id.set_lock_area_kill_password) {
-                        btMemBank = 0x05;
-                    } else if (mGroupLockAreaType.getCheckedRadioButtonId() == R.id.set_lock_area_epc) {
-                        btMemBank = 0x03;
-                    } else if (mGroupLockAreaType.getCheckedRadioButtonId() == R.id.set_lock_area_tid) {
-                        btMemBank = 0x02;
-                    } else if (mGroupLockAreaType.getCheckedRadioButtonId() == R.id.set_lock_area_user) {
-                        btMemBank = 0x01;
-                    }
-
-                    if (mGroupLockType.getCheckedRadioButtonId() == R.id.set_lock_free) {
-                        btLockType = 0x00;
-                    } else if (mGroupLockType.getCheckedRadioButtonId() == R.id.set_lock_free_ever) {
-                        btLockType = 0x02;
-                    } else if (mGroupLockType.getCheckedRadioButtonId() == R.id.set_lock_lock) {
-                        btLockType = 0x01;
-                    } else if (mGroupLockType.getCheckedRadioButtonId() == R.id.set_lock_lock_ever) {
-                        btLockType = 0x03;
-                    }
-
-                    try {
-                        String[] reslut = StringTool.stringToStringArray(mLockPasswordEditText.getText().toString().toUpperCase(), 2);
-                        btAryPassWord = StringTool.stringArrayToByteArray(reslut, 4);
-                    } catch (Exception e) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_lockpassword_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (btAryPassWord == null || btAryPassWord.length < 4) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_lockpassword_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    m_curOperateTagBuffer.clearBuffer();
-                    refreshList();
-                    mReader.lockTag(m_curReaderSetting.btReadId, btAryPassWord, btMemBank, btLockType);
-
-                    break;
-                }
-                case R.id.kill: {
-                    byte[] btAryPassWord = null;
-                    try {
-                        String[] reslut = StringTool.stringToStringArray(mKillPasswordEditText.getText().toString().toUpperCase(), 2);
-                        btAryPassWord = StringTool.stringArrayToByteArray(reslut, 4);
-                    } catch (Exception e) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_killpassword_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (btAryPassWord == null || btAryPassWord.length < 4) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_killpassword_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    m_curOperateTagBuffer.clearBuffer();
-                    refreshList();
-                    mReader.killTag(m_curReaderSetting.btReadId, btAryPassWord);
-                    break;
-                }
             }
         }
     };
@@ -604,10 +538,6 @@ public class OperateTagActivity extends BaseActivity {
                             }
                         }
                     case CMD.WRITE_TAG:
-                    case CMD.LOCK_TAG:
-                    case CMD.KILL_TAG:
-                        refreshList();
-                        refreshText();
                         break;
                 }
             } else if (intent.getAction().equals(ReaderHelper.BROADCAST_WRITE_LOG)) {
@@ -618,15 +548,6 @@ public class OperateTagActivity extends BaseActivity {
                 switch (btCmd) {
                     case CMD.REAL_TIME_INVENTORY:
                     case CMD.CUSTOMIZED_SESSION_TARGET_INVENTORY:
-                        // if (new Date().getTime() - mRefreshTime > 2000) {
-                        // refreshList();
-                        // mRefreshTime = new Date().getTime();
-                        // }
-                        // add by lei.li 2016/11/04
-                        // refreshStartStop(true);
-                        // add by lei.li 2016/11/04
-                        // Log.e("zhebian", "?????????????????????????????")
-                        // add by lei.li 2016/11/14
                         if (!mReaderHelper.getInventoryFlag()) {
                             if (!bTmpInventoryFlag) {
                                 bTmpInventoryFlag = true;
@@ -651,6 +572,7 @@ public class OperateTagActivity extends BaseActivity {
                         mLoopHandler.removeCallbacks(mLoopRunnable);
                         mLoopHandler.postDelayed(mLoopRunnable, 2000);
                         //refreshText();
+                        refreshList();
                         break;
                     case ReaderHelper.INVENTORY_ERR:
                     case ReaderHelper.INVENTORY_ERR_END:

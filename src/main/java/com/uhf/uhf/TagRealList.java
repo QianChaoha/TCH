@@ -105,10 +105,10 @@ public class TagRealList extends LinearLayout {
 				LayoutParams lp = (LayoutParams) mTagsRealListScrollView
 						.getLayoutParams();
 
-				if (lp.height <= wm.getDefaultDisplay().getHeight() / 2) {
+				if (lp.height <=0) {
 					// mTagsRealListScrollView.setVisibility(View.VISIBLE);
 
-					lp.height = (int) (wm.getDefaultDisplay().getHeight() / 1.5);
+					lp.height = (int) (wm.getDefaultDisplay().getHeight() / 3);
 					mTagsRealListScrollView.setLayoutParams(lp);
 					mTagsRealListScrollView.invalidate();
 
@@ -118,8 +118,8 @@ public class TagRealList extends LinearLayout {
 							R.string.close_tag_list));
 				} else {
 					// mTagsRealListScrollView.setVisibility(View.GONE);
-
-					lp.height = (int) (wm.getDefaultDisplay().getHeight() / 2.7);
+					lp.height = 0;
+					//lp.height = (int) (wm.getDefaultDisplay().getHeight() / 2.7);
 					mTagsRealListScrollView.setLayoutParams(lp);
 					mTagsRealListScrollView.invalidate();
 

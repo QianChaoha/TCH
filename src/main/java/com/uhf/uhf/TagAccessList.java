@@ -31,6 +31,9 @@ public class TagAccessList extends LinearLayout {
 	private ReaderHelper mReaderHelper;
 	
 	private List<OperateTagMap> data;
+
+	private TagRealList mTagRealList;
+
 	private AccessListAdapter mAccessListAdapter;
 	private ListView mTagAccessList;
 	
