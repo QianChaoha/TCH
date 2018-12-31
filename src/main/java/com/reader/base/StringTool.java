@@ -1,5 +1,9 @@
 package com.reader.base;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -26,7 +30,39 @@ public class StringTool {
 
         return btAryHex;
     }
-
+	/**
+	 * The encode formate of data scanned by scnner;
+	 * @param date the source data
+	 * @return the encode formate;
+	 * @throws IOException decode exception;
+	 */
+	public static String charsetName(byte[] date) throws IOException {
+		Charset charset = null;
+		InputStream is = new ByteArrayInputStream(date);
+		CodepageDetectorProxy detectorProxy = CodepageDetectorProxy.getInstance();
+		detectorProxy.add(new ParsingDetector(false));
+		detectorProxy.add(JChardetFacade.getInstance());
+		detectorProxy.add(ASCIIDetector.getInstance());
+		detectorProxy.add(UnicodeDetector.getInstance());
+		charset = detectorProxy.detectCodepage(is,date.length);
+		if (charset != null) {
+			return charset.name();
+		} else {
+			return "utf-8";
+		}
+	}
+	/**
+	 * get the subbytes of the parent bytes;
+	 * @param bytes parent bytes;
+	 * @param start start positon;
+	 * @param end end position;
+	 * @return the child bytes;
+	 */
+	public static byte[] subBytes(byte[] bytes, int start, int end){
+		byte[] subBytes = new byte[end - start];
+		System.arraycopy(bytes,start,subBytes,0,end - start);
+		return subBytes;
+	}
 	/**
 	 * string array to Hexadecimal array
 	 * @param strAryHex	 string array needs to be transfered

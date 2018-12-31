@@ -122,7 +122,19 @@ public class HomeActivity extends BaseActivity {
                 throw new RuntimeException("UHF RFID power on failure,may you open in other" +
                         " Process and do not exit it");
             }
-
+            try {
+                if (ModuleManager.newInstance().getUHFStatus()) {
+                    ModuleManager.newInstance().setUHFStatus(false);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),"摄像头被占用",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (!ModuleManager.newInstance().setScanStatus(true)) {
+                throw new RuntimeException("Scan power on failure,may you open in other" +
+                        "Process and do not exit it");
+            }
             return true;
             //finish();
         } catch (SecurityException e) {

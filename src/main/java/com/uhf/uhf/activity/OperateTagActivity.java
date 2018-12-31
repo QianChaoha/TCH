@@ -22,11 +22,13 @@ import com.reader.base.CMD;
 import com.reader.base.ERROR;
 import com.reader.base.ReaderBase;
 import com.reader.base.StringTool;
+import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ISO180006BOperateTagBuffer;
 import com.reader.helper.InventoryBuffer;
 import com.reader.helper.OperateTagBuffer;
 import com.reader.helper.ReaderHelper;
 import com.reader.helper.ReaderSetting;
+import com.reader.helper.TDCodeTagBuffer;
 import com.uhf.uhf.HexEditTextBox;
 import com.uhf.uhf.LogList;
 import com.uhf.uhf.R;
@@ -34,6 +36,8 @@ import com.uhf.uhf.TagAccessList;
 import com.uhf.uhf.TagRealList;
 import com.uhf.uhf.spiner.AbstractSpinerAdapter;
 import com.uhf.uhf.spiner.SpinerPopWindow;
+import com.yzq.zxinglibrary.android.CaptureActivity;
+import com.yzq.zxinglibrary.common.Constant;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +50,7 @@ import java.util.List;
  * @author: cqian
  */
 public class OperateTagActivity extends BaseActivity {
+    private static final int REQUEST_CODE_SCAN = 100;
     //fixed by lei.li 2016/11/09
     //private LogList mLogList;
     private LogList mLogList;
@@ -83,6 +88,9 @@ public class OperateTagActivity extends BaseActivity {
     private static OperateTagBuffer m_curOperateTagBuffer;
     private static ISO180006BOperateTagBuffer m_curOperateTagISO18000Buffer;
 
+    //二维码扫描
+    private static TDCodeTagBuffer m_curOperateBinDTagBuffer;
+
     private LocalBroadcastManager lbm;
 
     private Context mContext;
@@ -96,6 +104,7 @@ public class OperateTagActivity extends BaseActivity {
             mLoopHandler.postDelayed(this, 2000);
         }
     };
+
     private Handler mUpdateViewHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -120,7 +129,14 @@ public class OperateTagActivity extends BaseActivity {
     protected int getLayoutId() {
         return R.layout.activity_operate_tag;
     }
-
+    @Override
+    protected void onResume() {
+        if (mReader != null) {
+            if (!mReader.IsAlive())
+                mReader.StartWait();
+        }
+        super.onResume();
+    };
     @Override
     protected void initView() {
         mContext = this;
@@ -150,6 +166,7 @@ public class OperateTagActivity extends BaseActivity {
         mRead.setOnClickListener(setAccessOnClickListener);
         mSelect.setOnClickListener(setAccessOnClickListener);
         mWrite.setOnClickListener(setAccessOnClickListener);
+        findViewById(R.id.codeRead).setOnClickListener(setAccessOnClickListener);
 
         mPasswordEditText = (HexEditTextBox) findViewById(R.id.password_text);
         mStartAddrEditText = (EditText) findViewById(R.id.start_addr_text);
@@ -172,6 +189,7 @@ public class OperateTagActivity extends BaseActivity {
         itent.addAction(ReaderHelper.BROADCAST_WRITE_LOG);
         itent.addAction(ReaderHelper.BROADCAST_REFRESH_OPERATE_TAG);
         itent.addAction(ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL);
+        itent.addAction(CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE);
 
         lbm.registerReceiver(mRecv, itent);
 
@@ -501,7 +519,12 @@ public class OperateTagActivity extends BaseActivity {
                     }
 
                     break;
+
                 }
+                case R.id.codeRead:
+                    Intent intent = new Intent(mActivity, CaptureActivity.class);
+                    startActivityForResult(intent, REQUEST_CODE_SCAN);
+                    break;
             }
         }
     };
@@ -606,9 +629,24 @@ public class OperateTagActivity extends BaseActivity {
                     ReaderHelper.BROADCAST_WRITE_LOG)) {
                 mLogList.writeLog((String) intent.getStringExtra("log"),
                         intent.getIntExtra("type", ERROR.SUCCESS));
+            }else if (intent.getAction().equals(
+                    CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
+
             }
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // 扫描二维码/条码回传
+        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
+            if (data != null) {
+
+                String content = data.getStringExtra(Constant.CODED_CONTENT);
+                System.out.println("============   "+content);
+            }
+        }
+    }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
