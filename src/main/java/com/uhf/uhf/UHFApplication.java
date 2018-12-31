@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.com.tools.Beeper;
 import com.reader.base.ERROR;
+import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ReaderHelper;
 
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class UHFApplication extends Application {
 		super.onCreate();
 		try {
 			ReaderHelper.setContext(getApplicationContext());
+			CodeReaderHelper.setContext(getApplicationContext());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

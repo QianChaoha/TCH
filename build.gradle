@@ -45,4 +45,5 @@ dependencies {
     implementation 'com.yanzhenjie:permission:2.0.0-rc12'
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.4'
     implementation files('src/main/libs/cpdetector_1.0.10.jar')
+    implementation files('src/main/libs/chardet-1.0.jar')
 }

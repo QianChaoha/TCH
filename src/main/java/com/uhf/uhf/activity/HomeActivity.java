@@ -10,6 +10,7 @@ import com.example.administrator.baselib.base.BaseActivity;
 import com.nativec.tools.ModuleManager;
 import com.nativec.tools.SerialPort;
 import com.nativec.tools.SerialPortFinder;
+import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ReaderHelper;
 import com.uhf.uhf.ConnectRs232;
 import com.uhf.uhf.MainActivity;
@@ -40,6 +41,7 @@ public class HomeActivity extends BaseActivity {
     private int mPosPort = 0;
     public static SerialPort mSerialPort = null;
     private ReaderHelper mReaderHelper;
+    private CodeReaderHelper mCodeReaderHelper;
 
     @Override
     protected int getLayoutId() {
@@ -113,6 +115,10 @@ public class HomeActivity extends BaseActivity {
             try {
                 mReaderHelper = ReaderHelper.getDefaultHelper();
                 mReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
+
+                mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
+                mCodeReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
+
             } catch (Exception e) {
                 e.printStackTrace();
 

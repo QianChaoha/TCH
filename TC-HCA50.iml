@@ -127,6 +127,7 @@
     <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\Serialport-module.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okhttp:okhttp:2.7.2@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.antfortune.freeline:runtime-no-op-0.8.7" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\chardet-1.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\jxl.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design-27.1.0" level="project" />

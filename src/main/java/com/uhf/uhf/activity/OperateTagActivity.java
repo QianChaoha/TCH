@@ -23,6 +23,7 @@ import com.reader.base.ERROR;
 import com.reader.base.ReaderBase;
 import com.reader.base.StringTool;
 import com.reader.code.helper.CodeReaderHelper;
+import com.reader.code.helper.TDCodeList;
 import com.reader.helper.ISO180006BOperateTagBuffer;
 import com.reader.helper.InventoryBuffer;
 import com.reader.helper.OperateTagBuffer;
@@ -89,7 +90,10 @@ public class OperateTagActivity extends BaseActivity {
     private static ISO180006BOperateTagBuffer m_curOperateTagISO18000Buffer;
 
     //二维码扫描
-    private static TDCodeTagBuffer m_curOperateBinDTagBuffer;
+    private static TDCodeTagBuffer m_curOperateBinDCodeTagbuffer;
+    private CodeReaderHelper mCodeReaderHelper;
+    private TDCodeList mTagRealBCList=new TDCodeList();
+
 
     private LocalBroadcastManager lbm;
 
@@ -143,11 +147,13 @@ public class OperateTagActivity extends BaseActivity {
 
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
+            mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
 
         mAccessList = new ArrayList<String>();
 
@@ -631,22 +637,11 @@ public class OperateTagActivity extends BaseActivity {
                         intent.getIntExtra("type", ERROR.SUCCESS));
             }else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
-
+                mTagRealBCList.refreshList();
             }
         }
     };
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // 扫描二维码/条码回传
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
-            if (data != null) {
-
-                String content = data.getStringExtra(Constant.CODED_CONTENT);
-                System.out.println("============   "+content);
-            }
-        }
-    }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

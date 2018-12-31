@@ -7,6 +7,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import info.monitorenter.cpdetector.io.ASCIIDetector;
+import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
+import info.monitorenter.cpdetector.io.JChardetFacade;
+import info.monitorenter.cpdetector.io.ParsingDetector;
+import info.monitorenter.cpdetector.io.UnicodeDetector;
+
 public class StringTool {
 
 	/**
