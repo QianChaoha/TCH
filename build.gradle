@@ -46,4 +46,6 @@ dependencies {
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.4'
     implementation files('src/main/libs/cpdetector_1.0.10.jar')
     implementation files('src/main/libs/chardet-1.0.jar')
+    implementation files('src/main/libs/antlr-2.7.4.jar')
+    implementation files('src/main/libs/jargs-1.0.jar')
 }

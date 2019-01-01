@@ -128,6 +128,7 @@
     <orderEntry type="library" name="Gradle: com.squareup.okhttp:okhttp:2.7.2@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.antfortune.freeline:runtime-no-op-0.8.7" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\chardet-1.0.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\antlr-2.7.4.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\jxl.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design-27.1.0" level="project" />
@@ -136,6 +137,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support:multidex-instrumentation-1.0.2" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\TC-HCA50\src\main\libs\jargs-1.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.6.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.0" level="project" />

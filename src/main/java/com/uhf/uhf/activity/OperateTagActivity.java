@@ -70,6 +70,7 @@ public class OperateTagActivity extends BaseActivity {
     private HexEditTextBox mPasswordEditText;
     private EditText mStartAddrEditText;
     private EditText mDataLenEditText;
+    private EditText mCodeText;
     private HexEditTextBox mDataEditText;
     private HexEditTextBox mLockPasswordEditText;
     private HexEditTextBox mKillPasswordEditText;
@@ -92,7 +93,7 @@ public class OperateTagActivity extends BaseActivity {
     //二维码扫描
     private static TDCodeTagBuffer m_curOperateBinDCodeTagbuffer;
     private CodeReaderHelper mCodeReaderHelper;
-    //private TDCodeList mTagRealBCList=new TDCodeList();
+    private TDCodeList mTagRealBCList = new TDCodeList();
 
 
     private LocalBroadcastManager lbm;
@@ -133,6 +134,7 @@ public class OperateTagActivity extends BaseActivity {
     protected int getLayoutId() {
         return R.layout.activity_operate_tag;
     }
+
     @Override
     protected void onResume() {
         if (mReader != null) {
@@ -140,14 +142,17 @@ public class OperateTagActivity extends BaseActivity {
                 mReader.StartWait();
         }
         super.onResume();
-    };
+    }
+
+    ;
+
     @Override
     protected void initView() {
         mContext = this;
 
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
-           // mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
+            // mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -177,6 +182,7 @@ public class OperateTagActivity extends BaseActivity {
         mPasswordEditText = (HexEditTextBox) findViewById(R.id.password_text);
         mStartAddrEditText = (EditText) findViewById(R.id.start_addr_text);
         mDataLenEditText = (EditText) findViewById(R.id.data_length_text);
+        mCodeText = (EditText) findViewById(R.id.codeText);
         mDataEditText = (HexEditTextBox) findViewById(R.id.data_write_text);
         mLockPasswordEditText = (HexEditTextBox) findViewById(R.id.lock_password_text);
         mKillPasswordEditText = (HexEditTextBox) findViewById(R.id.kill_password_text);
@@ -635,9 +641,12 @@ public class OperateTagActivity extends BaseActivity {
                     ReaderHelper.BROADCAST_WRITE_LOG)) {
                 mLogList.writeLog((String) intent.getStringExtra("log"),
                         intent.getIntExtra("type", ERROR.SUCCESS));
-            }else if (intent.getAction().equals(
+            } else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
-                //mTagRealBCList.refreshList();
+                mTagRealBCList.refreshList();
+                if (mTagRealBCList.mData_BD != null && mTagRealBCList.mData_BD.size() > 0) {
+                    mCodeText.setText(mTagRealBCList.mData_BD.get(0).mBarCodeValue);
+                }
             }
         }
     };

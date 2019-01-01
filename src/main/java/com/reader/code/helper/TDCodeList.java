@@ -24,7 +24,7 @@ public class TDCodeList {
 
     private CodeReaderHelper mReaderHelper;
 
-    private List<TDCodeTagBuffer.BinDCodeTagMap> mData_BD;
+    public List<TDCodeTagBuffer.BinDCodeTagMap> mData_BD;
     //private TDCodeListAdapter mRealBDListAdapter;
     private ListView mTagRealBCList;
 
