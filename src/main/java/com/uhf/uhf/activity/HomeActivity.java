@@ -10,6 +10,8 @@ import com.example.administrator.baselib.base.BaseActivity;
 import com.nativec.tools.ModuleManager;
 import com.nativec.tools.SerialPort;
 import com.nativec.tools.SerialPortFinder;
+import com.reader.code.OpenScanUtils;
+import com.reader.code.OpenTTFUtils;
 import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ReaderHelper;
 import com.uhf.uhf.ConnectRs232;
@@ -50,16 +52,6 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mSerialPortFinder = new SerialPortFinder();
-
-        entries = mSerialPortFinder.getAllDevices();
-        entryValues = mSerialPortFinder.getAllDevicesPath();
-
-
-        String[] lists = entries;
-        for (int i = 0; i < lists.length; i++) {
-            mPortList.add(lists[i]);
-        }
     }
 
     @Override
@@ -80,7 +72,8 @@ public class HomeActivity extends BaseActivity {
                 SettingActivity.startSettingActivity(this);
                 break;
             case R.id.btTagRw:
-                if (connect()) {
+                OpenScanUtils.openScan(mActivity);
+                if (OpenTTFUtils.openUHF(mActivity)) {
                     OperateTagActivity.startOperateTagActivity(this);
                 }
                 break;
@@ -116,28 +109,24 @@ public class HomeActivity extends BaseActivity {
                 mReaderHelper = ReaderHelper.getDefaultHelper();
                 mReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
 
-                mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
-                mCodeReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
+//                mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
+//                mCodeReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
 
             } catch (Exception e) {
                 e.printStackTrace();
 
                 return false;
             }
-            if (!ModuleManager.newInstance().setUHFStatus(true)) {
-                throw new RuntimeException("UHF RFID power on failure,may you open in other" +
-                        " Process and do not exit it");
-            }
             try {
-                if (ModuleManager.newInstance().getUHFStatus()) {
-                    ModuleManager.newInstance().setUHFStatus(false);
+                if (ModuleManager.newInstance().getScanStatus()) {
+                    ModuleManager.newInstance().setScanStatus(false);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(getApplicationContext(),"摄像头被占用",Toast.LENGTH_SHORT).show();
                 return false;
             }
-            if (!ModuleManager.newInstance().setScanStatus(true)) {
+            if (!ModuleManager.newInstance().setUHFStatus(true)) {
                 throw new RuntimeException("Scan power on failure,may you open in other" +
                         "Process and do not exit it");
             }

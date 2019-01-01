@@ -92,7 +92,7 @@ public class OperateTagActivity extends BaseActivity {
     //二维码扫描
     private static TDCodeTagBuffer m_curOperateBinDCodeTagbuffer;
     private CodeReaderHelper mCodeReaderHelper;
-    private TDCodeList mTagRealBCList=new TDCodeList();
+    //private TDCodeList mTagRealBCList=new TDCodeList();
 
 
     private LocalBroadcastManager lbm;
@@ -147,13 +147,13 @@ public class OperateTagActivity extends BaseActivity {
 
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
-            mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
+           // mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
+//        m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
 
         mAccessList = new ArrayList<String>();
 
@@ -637,7 +637,7 @@ public class OperateTagActivity extends BaseActivity {
                         intent.getIntExtra("type", ERROR.SUCCESS));
             }else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
-                mTagRealBCList.refreshList();
+                //mTagRealBCList.refreshList();
             }
         }
     };
