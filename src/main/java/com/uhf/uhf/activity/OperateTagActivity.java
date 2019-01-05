@@ -71,6 +71,8 @@ public class OperateTagActivity extends BaseActivity {
     private EditText mStartAddrEditText;
     private EditText mDataLenEditText;
     private EditText mCodeText;
+    private EditText mPasswordBottom;
+    private EditText mCodeTextBroad;
     private HexEditTextBox mDataEditText;
     private HexEditTextBox mLockPasswordEditText;
     private HexEditTextBox mKillPasswordEditText;
@@ -167,7 +169,8 @@ public class OperateTagActivity extends BaseActivity {
         m_curOperateTagBuffer = mReaderHelper.getCurOperateTagBuffer();
         m_curOperateTagISO18000Buffer = mReaderHelper.getCurOperateTagISO18000Buffer();
 
-
+        mPasswordBottom = findViewById(R.id.password_text_bottom);
+        mCodeTextBroad = findViewById(R.id.codeTextBroad);
         mLogList = (LogList) findViewById(R.id.log_list);
         mStartStop = (TextView) findViewById(R.id.get);
         mRead = (TextView) findViewById(R.id.read);
@@ -178,6 +181,10 @@ public class OperateTagActivity extends BaseActivity {
         mSelect.setOnClickListener(setAccessOnClickListener);
         mWrite.setOnClickListener(setAccessOnClickListener);
         findViewById(R.id.codeRead).setOnClickListener(setAccessOnClickListener);
+        findViewById(R.id.codeWrite).setOnClickListener(setAccessOnClickListener);
+        findViewById(R.id.codeWriteBroad).setOnClickListener(setAccessOnClickListener);
+        findViewById(R.id.readBroad).setOnClickListener(setAccessOnClickListener);
+        findViewById(R.id.codeReadBroad).setOnClickListener(setAccessOnClickListener);
 
         mPasswordEditText = (HexEditTextBox) findViewById(R.id.password_text);
         mStartAddrEditText = (EditText) findViewById(R.id.start_addr_text);
@@ -399,147 +406,190 @@ public class OperateTagActivity extends BaseActivity {
                     break;
                 }
                 case R.id.select: {
-                    if (mPos <= 0) {
-                        mReader.cancelAccessEpcMatch(m_curReaderSetting.btReadId);
-                    } else {
-                        byte[] btAryEpc = null;
-
-                        try {
-                            String[] result = StringTool.stringToStringArray(mAccessList.get(mPos).toUpperCase(), 2);
-                            btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
-                        } catch (Exception e) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_unknown_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if (btAryEpc == null) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_unknown_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        mReader.setAccessEpcMatch(m_curReaderSetting.btReadId, (byte) (btAryEpc.length & 0xFF), btAryEpc);
-                    }
+                    selectTag(mPos);
                     break;
                 }
                 case R.id.read:
-                case R.id.write: {
-                    byte btMemBank = 0x00;
-                    byte btWordAdd = 0x00;
-                    byte btWordCnt = 0x00;
-                    byte[] btAryPassWord = null;
-//                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_password) {
-//                        btMemBank = 0x00;
-//                    } else
-                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_epc) {
-                        btMemBank = 0x01;
-                    } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_tid) {
-                        btMemBank = 0x02;
-                    } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_user) {
-                        btMemBank = 0x03;
-                    }
-
-                    try {
-                        btWordAdd = (byte) Integer.parseInt(mStartAddrEditText.getText().toString());
-                    } catch (Exception e) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_start_addr_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    try {
-                        String[] reslut = StringTool.stringToStringArray(mPasswordEditText.getText().toString().toUpperCase(), 2);
-                        btAryPassWord = StringTool.stringArrayToByteArray(reslut, 4);
-                    } catch (Exception e) {
-                        Toast.makeText(
-                                mContext,
-                                getResources().getString(R.string.param_password_error),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (arg0.getId() == R.id.read) {
-                        try {
-                            btWordCnt = (byte) (Integer.parseInt(mDataLenEditText.getText().toString()));
-                        } catch (Exception e) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_data_len_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if ((btWordCnt & 0xFF) <= 0) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_data_len_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        m_curOperateTagBuffer.clearBuffer();
-                        refreshList();
-                        // 1.标签id
-                        // 2. 0x00:RESERVED, 0x01:EPC, 0x02:TID, 0x03:USER
-                        // 3. 起始长度
-                        // 4.密码
-                        mReader.readTag(m_curReaderSetting.btReadId, btMemBank, btWordAdd, btWordCnt, btAryPassWord);
-
-                    } else {
-                        byte[] btAryData = null;
-                        String[] result = null;
-                        try {
-                            result = StringTool.stringToStringArray(mDataEditText.getText().toString().toUpperCase(), 2);
-                            btAryData = StringTool.stringArrayToByteArray(result, result.length);
-                            btWordCnt = (byte) ((result.length / 2 + result.length % 2) & 0xFF);
-                        } catch (Exception e) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_data_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if (btAryData == null || btAryData.length <= 0) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_data_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if (btAryPassWord == null || btAryPassWord.length < 4) {
-                            Toast.makeText(
-                                    mContext,
-                                    getResources().getString(R.string.param_password_error),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        mDataLenEditText.setText(String.valueOf(btWordCnt & 0xFF));
-
-                        m_curOperateTagBuffer.clearBuffer();
-                        refreshList();
-                        mReader.writeTag(m_curReaderSetting.btReadId, btAryPassWord, btMemBank, btWordAdd, btWordCnt, btAryData);
-                    }
-
+                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
+                    setBtState(R.id.read, R.id.codeRead);
                     break;
-
-                }
                 case R.id.codeRead:
-                    Intent intent = new Intent(mActivity, CaptureActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_SCAN);
+                    setBtState(R.id.codeRead, R.id.read);
+                    break;
+                case R.id.write: {
+                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 2, mDataEditText.getText().toString().toUpperCase());
+                    break;
+                }
+                case R.id.codeWrite:
+                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 2, mCodeText.getText().toString().toUpperCase());
+                    break;
+                case R.id.codeWriteBroad:
+                    //循环写入
+                    if (mAccessList != null && mAccessList.size() > 0) {
+                        for (int i = 1; i < mAccessList.size(); i++) {
+                            selectTag(i);
+                            operateData(mPasswordBottom.getText().toString().toUpperCase(), 2, mCodeTextBroad.getText().toString().toUpperCase());
+                        }
+                    }
+                    break;
+                case R.id.readBroad:
+                    setBtState(R.id.readBroad, R.id.codeReadBroad);
+                    operateData(mPasswordBottom.getText().toString().toUpperCase(), 1, mCodeTextBroad.getText().toString().toUpperCase());
+                    break;
+                case R.id.codeReadBroad:
+                    setBtState(R.id.codeReadBroad, R.id.readBroad);
                     break;
             }
         }
     };
+
+    private void setBtState(int enableId, int disableId) {
+        findViewById(enableId).setBackgroundResource(R.drawable.button_press_background);
+        findViewById(disableId).setBackgroundResource(R.drawable.button_disenabled_background);
+    }
+
+    private void selectTag(int pos) {
+        if (pos <= 0) {
+            mReader.cancelAccessEpcMatch(m_curReaderSetting.btReadId);
+        } else {
+            byte[] btAryEpc = null;
+
+            try {
+                String[] result = StringTool.stringToStringArray(mAccessList.get(pos).toUpperCase(), 2);
+                btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
+            } catch (Exception e) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_unknown_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (btAryEpc == null) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_unknown_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            mReader.setAccessEpcMatch(m_curReaderSetting.btReadId, (byte) (btAryEpc.length & 0xFF), btAryEpc);
+
+            mReader.getAccessEpcMatch(m_curReaderSetting.btReadId);
+
+
+        }
+    }
+
+    /**
+     * @param password  密码
+     * @param type      1 读取  2写入
+     * @param writeData 写入的数据
+     */
+    private void operateData(String password, int type, String writeData) {
+        byte btMemBank = 0x00;
+        byte btWordAdd = 0x00;
+        byte btWordCnt = 0x00;
+        byte[] btAryPassWord = null;
+//                    if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_password) {
+//                        btMemBank = 0x00;
+//                    } else
+        if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_epc) {
+            btMemBank = 0x01;
+        } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_tid) {
+            btMemBank = 0x02;
+        } else if (mGroupAccessAreaType.getCheckedRadioButtonId() == R.id.set_access_area_user) {
+            btMemBank = 0x03;
+        }
+
+        try {
+            btWordAdd = (byte) Integer.parseInt(mStartAddrEditText.getText().toString());
+        } catch (Exception e) {
+            Toast.makeText(
+                    mContext,
+                    getResources().getString(R.string.param_start_addr_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            String[] reslut = StringTool.stringToStringArray(password, 2);
+            btAryPassWord = StringTool.stringArrayToByteArray(reslut, 4);
+        } catch (Exception e) {
+            Toast.makeText(
+                    mContext,
+                    getResources().getString(R.string.param_password_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (type == 1) {
+            try {
+                btWordCnt = (byte) (Integer.parseInt(mDataLenEditText.getText().toString()));
+            } catch (Exception e) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_data_len_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if ((btWordCnt & 0xFF) <= 0) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_data_len_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            m_curOperateTagBuffer.clearBuffer();
+            refreshList();
+            // 1.标签id
+            // 2. 0x00:RESERVED, 0x01:EPC, 0x02:TID, 0x03:USER
+            // 3. 起始长度
+            // 4.密码
+            if (mReader!=null){
+                mReader.readTag(m_curReaderSetting.btReadId, btMemBank, btWordAdd, btWordCnt, btAryPassWord);
+            }
+
+        } else {
+            byte[] btAryData = null;
+            String[] result = null;
+            try {
+                result = StringTool.stringToStringArray(writeData, 2);
+                btAryData = StringTool.stringArrayToByteArray(result, result.length);
+                btWordCnt = (byte) ((result.length / 2 + result.length % 2) & 0xFF);
+            } catch (Exception e) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_data_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (btAryData == null || btAryData.length <= 0) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_data_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (btAryPassWord == null || btAryPassWord.length < 4) {
+                Toast.makeText(
+                        mContext,
+                        getResources().getString(R.string.param_password_error),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            mDataLenEditText.setText(String.valueOf(btWordCnt & 0xFF));
+
+            m_curOperateTagBuffer.clearBuffer();
+            refreshList();
+            mReader.writeTag(m_curReaderSetting.btReadId, btAryPassWord, btMemBank, btWordAdd, btWordCnt, btAryData);
+        }
+    }
 
     private void refreshList() {
         mTagAccessList.refreshList();

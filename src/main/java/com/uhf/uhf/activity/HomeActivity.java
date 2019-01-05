@@ -14,10 +14,19 @@ import com.reader.code.OpenScanUtils;
 import com.reader.code.OpenTTFUtils;
 import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ReaderHelper;
+import com.tamic.novate.Throwable;
 import com.uhf.uhf.ConnectRs232;
 import com.uhf.uhf.MainActivity;
 import com.uhf.uhf.R;
+import com.uhf.uhf.bean.TokenBean;
+import com.uhf.uhf.http.CallBack;
+import com.uhf.uhf.http.HttpUrl;
+import com.uhf.uhf.http.HttpUtils;
 import com.uhf.uhf.util.GetPermissionUtil;
+import com.uhf.uhf.util.LoaddingUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +36,8 @@ import java.util.List;
 
 import butterknife.OnClick;
 
+import static com.uhf.uhf.UHFApplication.mUserBean;
+
 /**
  * Description:
  * Data: 2018/12/27
@@ -34,16 +45,8 @@ import butterknife.OnClick;
  * @author: cqian
  */
 public class HomeActivity extends BaseActivity {
-    private SerialPortFinder mSerialPortFinder;
-    String[] entries = null;
-    String[] entryValues = null;
-    private int baud = 115200;
-    private List<String> mPortList = new ArrayList<String>();
-    private static final String TTYS1 = "ttyS4 (rk_serial)";
-    private int mPosPort = 0;
-    public static SerialPort mSerialPort = null;
-    private ReaderHelper mReaderHelper;
-    private CodeReaderHelper mCodeReaderHelper;
+    LoaddingUtils mLoaddingUtils;
+
 
     @Override
     protected int getLayoutId() {
@@ -52,6 +55,8 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        mLoaddingUtils = new LoaddingUtils(mActivity);
+        mLoaddingUtils.show();
     }
 
     @Override
@@ -61,13 +66,35 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void getData() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("usernameOrEmailAddress", "admin");
+            jsonObject.put("password", "123qwe");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HttpUtils.doPost(HttpUrl.TOKEN_AUTH, jsonObject, new CallBack<TokenBean>() {
 
+            @Override
+            public void onSuccess(TokenBean data) {
+                mUserBean = data.result;
+                mLoaddingUtils.dismiss();
+            }
+
+            @Override
+            public void onFailed(Throwable e) {
+                mLoaddingUtils.dismiss();
+            }
+        });
     }
 
 
-    @OnClick({R.id.btSetting, R.id.btTagRw})
+    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btGet:
+                GetDataActivity.startGetDataActivity(this);
+                break;
             case R.id.btSetting:
                 SettingActivity.startSettingActivity(this);
                 break;
@@ -80,74 +107,4 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    private boolean connect() {
-        if (mPortList.indexOf(TTYS1) >= 0)
-            mPosPort = mPortList.indexOf(TTYS1);
-
-        if (entryValues == null || entryValues.length == 0) {
-            Toast.makeText(
-                    this,
-                    "设备不可用",
-                    Toast.LENGTH_SHORT).show();
-            return false;
-
-        }
-        if (mPosPort < 0) {
-            Toast.makeText(
-                    this,
-                    getResources().getString(R.string.rs232_error),
-                    Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        try {
-
-            mSerialPort = new SerialPort(new File(entryValues[mPosPort]), baud, 0);
-
-
-            try {
-                mReaderHelper = ReaderHelper.getDefaultHelper();
-                mReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
-
-//                mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
-//                mCodeReaderHelper.setReader(mSerialPort.getInputStream(), mSerialPort.getOutputStream());
-
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                return false;
-            }
-            try {
-                if (ModuleManager.newInstance().getScanStatus()) {
-                    ModuleManager.newInstance().setScanStatus(false);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(),"摄像头被占用",Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            if (!ModuleManager.newInstance().setUHFStatus(true)) {
-                throw new RuntimeException("Scan power on failure,may you open in other" +
-                        "Process and do not exit it");
-            }
-            return true;
-            //finish();
-        } catch (SecurityException e) {
-            Toast.makeText(
-                    this,
-                    getResources().getString(R.string.error_security),
-                    Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Toast.makeText(
-                    this,
-                    getResources().getString(R.string.error_unknown),
-                    Toast.LENGTH_SHORT).show();
-        } catch (InvalidParameterException e) {
-            Toast.makeText(
-                    this,
-                    getResources().getString(R.string.error_configuration),
-                    Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
 }

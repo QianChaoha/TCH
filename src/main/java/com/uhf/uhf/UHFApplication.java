@@ -15,6 +15,8 @@ import com.com.tools.Beeper;
 import com.reader.base.ERROR;
 import com.reader.code.helper.CodeReaderHelper;
 import com.reader.helper.ReaderHelper;
+import com.uhf.uhf.bean.TokenBean;
+import com.uhf.uhf.http.HttpUtils;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -25,94 +27,97 @@ import java.util.List;
 
 public class UHFApplication extends Application {
 
-	//add by lei.li 2016/11/12
-	private static Context mContext;
-	//add by lei.li 2016/11/12
-	
-	private Socket mTcpSocket = null;
-	private BluetoothSocket mBtSocket = null;
+    //add by lei.li 2016/11/12
+    private static Context mContext;
+    //add by lei.li 2016/11/12
 
-	public ArrayList<CharSequence> mMonitorListItem = new ArrayList<CharSequence>();
+    private Socket mTcpSocket = null;
+    private BluetoothSocket mBtSocket = null;
 
-	public final void writeMonitor(String strLog, int type) {
-		Date now = new Date();
-		SimpleDateFormat temp = new SimpleDateFormat("kk:mm:ss");
-		SpannableString tSS = new SpannableString(temp.format(now) + ":\n"
-				+ strLog);
-		tSS.setSpan(new ForegroundColorSpan(type == ERROR.SUCCESS ? Color.BLACK
-				: Color.RED), 0, tSS.length(),
-				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); 
-		mMonitorListItem.add(tSS);
-		if (mMonitorListItem.size() > 1000)
-			mMonitorListItem.remove(0);
-	}
+    public ArrayList<CharSequence> mMonitorListItem = new ArrayList<CharSequence>();
 
-	private List<Activity> activities = new ArrayList<Activity>();
+    public final void writeMonitor(String strLog, int type) {
+        Date now = new Date();
+        SimpleDateFormat temp = new SimpleDateFormat("kk:mm:ss");
+        SpannableString tSS = new SpannableString(temp.format(now) + ":\n"
+                + strLog);
+        tSS.setSpan(new ForegroundColorSpan(type == ERROR.SUCCESS ? Color.BLACK
+                        : Color.RED), 0, tSS.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mMonitorListItem.add(tSS);
+        if (mMonitorListItem.size() > 1000)
+            mMonitorListItem.remove(0);
+    }
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		try {
-			ReaderHelper.setContext(getApplicationContext());
-			CodeReaderHelper.setContext(getApplicationContext());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		mContext = getApplicationContext();
-		Beeper.init(mContext);
-		
+    public static TokenBean.UserBean mUserBean;
+    private List<Activity> activities = new ArrayList<Activity>();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        try {
+            ReaderHelper.setContext(getApplicationContext());
+            CodeReaderHelper.setContext(getApplicationContext());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        mContext = getApplicationContext();
+        Beeper.init(mContext);
+        HttpUtils.init(getContext());
 		/*CrashHandler crashHandler = CrashHandler.getInstance();
 		crashHandler.init(getApplicationContext());*/
-	}
+    }
 
-	public void addActivity(Activity activity) {
-		activities.add(activity);
-	}
+    public void addActivity(Activity activity) {
+        activities.add(activity);
+    }
 
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-		//ControlGPIO.newInstance().JNIwriteGPIO(0);
-		for (Activity activity : activities) {
-			try {
-				activity.finish();
-			} catch (Exception e) {
-				;
-			}
-		}
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        //ControlGPIO.newInstance().JNIwriteGPIO(0);
+        for (Activity activity : activities) {
+            try {
+                activity.finish();
+            } catch (Exception e) {
+                ;
+            }
+        }
 
-		try {
-			if (mTcpSocket != null)
-				mTcpSocket.close();
-			if (mBtSocket != null)
-				mBtSocket.close();
-		} catch (IOException e) {
-		}
+        try {
+            if (mTcpSocket != null)
+                mTcpSocket.close();
+            if (mBtSocket != null)
+                mBtSocket.close();
+        } catch (IOException e) {
+        }
 
-		mTcpSocket = null;
-		mBtSocket = null;
-		if (ConnectRs232.mSerialPort != null) {
-			Log.e("close serial", "serial");
-			ConnectRs232.mSerialPort.close();
-		}
+        mTcpSocket = null;
+        mBtSocket = null;
+        if (ConnectRs232.mSerialPort != null) {
+            Log.e("close serial", "serial");
+            ConnectRs232.mSerialPort.close();
+        }
 
-		if (BluetoothAdapter.getDefaultAdapter() != null)
-			BluetoothAdapter.getDefaultAdapter().disable();
+        if (BluetoothAdapter.getDefaultAdapter() != null)
+            BluetoothAdapter.getDefaultAdapter().disable();
 
-		System.exit(0);
-	};
+        System.exit(0);
+    }
 
-	public void setTcpSocket(Socket socket) {
-		this.mTcpSocket = socket;
-	}
+    ;
 
-	public void setBtSocket(BluetoothSocket socket) {
-		this.mBtSocket = socket;
-	}
-	
-	public static Context getContext(){
-		return mContext;
-	}
+    public void setTcpSocket(Socket socket) {
+        this.mTcpSocket = socket;
+    }
+
+    public void setBtSocket(BluetoothSocket socket) {
+        this.mBtSocket = socket;
+    }
+
+    public static Context getContext() {
+        return mContext;
+    }
 }
