@@ -55,6 +55,16 @@ public class BaseViewHolder extends RecyclerView.ViewHolder implements View.OnLo
         }
         return this;
     }
+    public BaseViewHolder setText(int viewId, CharSequence text,int color ) {
+        TextView tv = getView(viewId);
+        if (text == null) {
+            tv.setText("");
+        } else {
+            tv.setText(text);
+            tv.setBackgroundColor(color);
+        }
+        return this;
+    }
     public BaseViewHolder setTextWithDefault(int viewId, CharSequence text) {
         TextView tv = getView(viewId);
         if (TextUtils.isEmpty(text)) {

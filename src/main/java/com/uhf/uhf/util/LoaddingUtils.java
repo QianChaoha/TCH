@@ -14,6 +14,7 @@ public class LoaddingUtils {
 
     public LoaddingUtils(Context context) {
         mProgressDialog = new ProgressDialog(context);
+        mProgressDialog.setMessage("获取数据中...");
     }
 
     public void show() {

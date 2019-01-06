@@ -14,4 +14,6 @@ public class HttpUrl {
 
     //获取所有下发的的盘点
     public static final String GET_ASSERT = "api/services/app/assetCheck/GetUnfinishedAssetChecks";
+    //上传盘点
+    public static final String UPLOAD_ASSERT = "api/services/app/AssetCheck/UploadAssetChecksResult";
 }

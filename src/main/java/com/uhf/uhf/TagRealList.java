@@ -34,7 +34,7 @@ public class TagRealList extends LinearLayout {
 
 	private ReaderHelper mReaderHelper;
 
-	private List<InventoryTagMap> data;
+	public List<InventoryTagMap> data;
 	private RealListAdapter mRealListAdapter;
 	private ListView mTagRealList;
 

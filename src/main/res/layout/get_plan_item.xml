@@ -12,51 +12,55 @@
         <TextView
             android:id="@+id/tvNo"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
+            android:paddingLeft="5dp"
             android:text="No." />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/border_color" />
+            android:background="@android:color/black" />
 
         <TextView
             android:id="@+id/tvEpc"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="8"
+            android:paddingLeft="5dp"
             android:text="EPC" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/border_color" />
+            android:background="@android:color/black" />
 
         <TextView
             android:id="@+id/tvCount"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="3"
+            android:paddingRight="5dp"
             android:gravity="right"
             android:text="次数" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/border_color" />
+            android:background="@android:color/black" />
 
         <TextView
             android:id="@+id/tvRssi"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="3"
             android:gravity="right"
+            android:paddingRight="5dp"
             android:text="RSSI" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/border_color" />
+        android:background="@android:color/black" />
 </LinearLayout>

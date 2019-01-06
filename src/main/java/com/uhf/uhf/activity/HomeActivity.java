@@ -2,6 +2,8 @@ package com.uhf.uhf.activity;
 
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -48,6 +50,7 @@ public class HomeActivity extends BaseActivity {
     LoaddingUtils mLoaddingUtils;
 
 
+
     @Override
     protected int getLayoutId() {
         return R.layout.activity_home;
@@ -57,6 +60,7 @@ public class HomeActivity extends BaseActivity {
     protected void initView() {
         mLoaddingUtils = new LoaddingUtils(mActivity);
         mLoaddingUtils.show();
+
     }
 
     @Override
@@ -93,10 +97,13 @@ public class HomeActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btGet:
-                GetDataActivity.startGetDataActivity(this);
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    GetDataActivity.startGetDataActivity(this);
+                }
                 break;
             case R.id.btSetting:
-                SettingActivity.startSettingActivity(this);
+                //SettingActivity.startSettingActivity(this);
+                startActivity(new Intent(mActivity,ConnectRs232.class));
                 break;
             case R.id.btTagRw:
                 OpenScanUtils.openScan(mActivity);

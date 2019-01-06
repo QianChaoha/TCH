@@ -17,6 +17,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
 import com.reader.base.CMD;
 import com.reader.base.ERROR;
@@ -548,7 +549,7 @@ public class OperateTagActivity extends BaseActivity {
             // 2. 0x00:RESERVED, 0x01:EPC, 0x02:TID, 0x03:USER
             // 3. 起始长度
             // 4.密码
-            if (mReader!=null){
+            if (mReader != null) {
                 mReader.readTag(m_curReaderSetting.btReadId, btMemBank, btWordAdd, btWordCnt, btAryPassWord);
             }
 
@@ -753,4 +754,19 @@ public class OperateTagActivity extends BaseActivity {
         return false;
     }
 
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        if (lbm != null)
+            lbm.unregisterReceiver(mRecv);
+        mLoopHandler.removeCallbacks(mLoopRunnable);
+        mHandler.removeCallbacks(mRefreshRunnable);
+        Beeper.release();
+
+        if (mReader != null) {
+            if (mReader.IsAlive())
+                mReader.signOut();
+        }
+    }
 }
