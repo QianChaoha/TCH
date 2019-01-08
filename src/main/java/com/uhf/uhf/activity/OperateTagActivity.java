@@ -19,10 +19,13 @@ import android.widget.Toast;
 
 import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
+import com.nativec.tools.ModuleManager;
 import com.reader.base.CMD;
 import com.reader.base.ERROR;
 import com.reader.base.ReaderBase;
 import com.reader.base.StringTool;
+import com.reader.code.OpenScanUtils;
+import com.reader.code.OpenTTFUtils;
 import com.reader.code.helper.CodeReaderHelper;
 import com.reader.code.helper.TDCodeList;
 import com.reader.helper.ISO180006BOperateTagBuffer;
@@ -75,11 +78,8 @@ public class OperateTagActivity extends BaseActivity {
     private EditText mPasswordBottom;
     private EditText mCodeTextBroad;
     private HexEditTextBox mDataEditText;
-    private HexEditTextBox mLockPasswordEditText;
-    private HexEditTextBox mKillPasswordEditText;
 
     private RadioGroup mGroupAccessAreaType;
-    private RadioGroup mGroupLockType;
 
     private TagRealList mTagAccessList;
 
@@ -147,7 +147,6 @@ public class OperateTagActivity extends BaseActivity {
         super.onResume();
     }
 
-    ;
 
     @Override
     protected void initView() {
@@ -192,11 +191,8 @@ public class OperateTagActivity extends BaseActivity {
         mDataLenEditText = (EditText) findViewById(R.id.data_length_text);
         mCodeText = (EditText) findViewById(R.id.codeText);
         mDataEditText = (HexEditTextBox) findViewById(R.id.data_write_text);
-        mLockPasswordEditText = (HexEditTextBox) findViewById(R.id.lock_password_text);
-        mKillPasswordEditText = (HexEditTextBox) findViewById(R.id.kill_password_text);
 
         mGroupAccessAreaType = (RadioGroup) findViewById(R.id.group_access_area_type);
-        mGroupLockType = (RadioGroup) findViewById(R.id.group_lock_type);
 
         mTagAccessListText = (TextView) findViewById(R.id.tag_access_list_text);
         mDropDownRow = (TableRow) findViewById(R.id.table_row_tag_access_list);
@@ -232,6 +228,7 @@ public class OperateTagActivity extends BaseActivity {
                 setAccessSelectText(pos);
             }
         });
+        refresh();
 
     }
 
@@ -252,11 +249,8 @@ public class OperateTagActivity extends BaseActivity {
         mDataLenEditText.setText("");
         mDataEditText.setText("");
         mPasswordEditText.setText("");
-        mLockPasswordEditText.setText("");
-        mKillPasswordEditText.setText("");
 
         mGroupAccessAreaType.check(R.id.set_access_area_epc);
-        mGroupLockType.check(R.id.set_lock_free);
 
         m_curOperateTagBuffer.clearBuffer();
 
@@ -326,14 +320,7 @@ public class OperateTagActivity extends BaseActivity {
                     Toast.LENGTH_SHORT).show();
             return;
         }
-
-//        if (mCbRealSet.isChecked() && mCbRealSession.isChecked()) {
-//            m_curInventoryBuffer.bLoopCustomizedSession = true;
-//            m_curInventoryBuffer.btSession = (byte) (mPos1 & 0xFF);
-//            m_curInventoryBuffer.btTarget = (byte) (mPos2 & 0xFF);
-//        } else {
         m_curInventoryBuffer.bLoopCustomizedSession = false;
-        // }
 
         {
             if (!mStartStop.getText().toString()
@@ -342,9 +329,6 @@ public class OperateTagActivity extends BaseActivity {
                 mReaderHelper.setInventoryFlag(false);
                 m_curInventoryBuffer.bLoopInventoryReal = false;
 
-                // mReaderHelper.clearInventoryTotal();
-                // Log.e("zheliyelaidaol", "BBBBBBBBBBBBBBBBBBBBBBB");
-                // Log.e("flaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaag",mStartStop.getText().toString());
 
                 refreshStartStop(false);
                 mLoopHandler.removeCallbacks(mLoopRunnable);
@@ -353,11 +337,6 @@ public class OperateTagActivity extends BaseActivity {
                 return;
             } else {
                 refreshStartStop(true);
-                // Log.e("flaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaag",mStartStop.getText().toString());
-
-                // start_add by lei.li 2016/11/04
-                // mReaderHelper.setInventoryFlag(true);
-                // end_add by lei.li 2016/11/04
             }
         }
 
@@ -639,51 +618,27 @@ public class OperateTagActivity extends BaseActivity {
                                 bTmpInventoryFlag = true;
                                 mHandler.removeCallbacks(mRefreshRunnable);
                                 mHandler.postDelayed(mRefreshRunnable, 2000);
-
-                                // rm by lei.li 2016/11/04
-                                // m_curInventoryBuffer.clearInventoryRealResult();
-                                // mReaderHelper.clearInventoryTotal();
-                                // Log.e("zhebian",
-                                // "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                             }
                         }
                         mUpdateViewHandler.sendEmptyMessage(0);
-                        // add by lei.li 2016/11/14
-                        //refreshList();
-                        // add by lei.li 2016/11/14
-
                         mHandler.removeCallbacks(mRefreshRunnable);
                         mHandler.postDelayed(mRefreshRunnable, 2000);
-                        // add by lei.li 2016/11/14
                         mLoopHandler.removeCallbacks(mLoopRunnable);
                         mLoopHandler.postDelayed(mLoopRunnable, 2000);
-                        //refreshText();
                         refreshList();
                         break;
                     case ReaderHelper.INVENTORY_ERR:
                     case ReaderHelper.INVENTORY_ERR_END:
                     case ReaderHelper.INVENTORY_END:
-                        // add by lei.li have some problem why it was annotation
-                        // refreshList();
-                        //refreshList();
-                        // add by lei.li
-                        // add by lei.li 2016/11/
                         if (mReaderHelper.getInventoryFlag() /* || bTmpInventoryFlag */) {
                             mLoopHandler.removeCallbacks(mLoopRunnable);
                             mLoopHandler.postDelayed(mLoopRunnable, 2000);
 
                         } else {
                             mLoopHandler.removeCallbacks(mLoopRunnable);
-                            // add by lei.li 2016/11/14
                             mHandler.removeCallbacks(mRefreshRunnable);
-                            // add by lei.li 2016/11/14
                         }
 
-                        // start_add by lei.li 2016/11/04
-                        // refreshStartStop(false);
-                        // end_add by lei.li 2016/11/04
-                        // start_add by lei.li 2016/11/04
-                        //refreshText(); // fixed by lei.li 2016/11/04
                         mUpdateViewHandler.sendEmptyMessage(0);
                         break;
                 }
@@ -756,17 +711,18 @@ public class OperateTagActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         if (lbm != null)
             lbm.unregisterReceiver(mRecv);
+
+        m_curInventoryBuffer.clearInventoryRealResult();
+
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
+
+
         Beeper.release();
 
-        if (mReader != null) {
-            if (mReader.IsAlive())
-                mReader.signOut();
-        }
+        ModuleManager.newInstance().setUHFStatus(false);
     }
 }

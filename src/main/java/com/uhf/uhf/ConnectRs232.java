@@ -139,7 +139,7 @@ public class ConnectRs232 extends BaseActivity {
 
 
 
-		connect();
+		//connect();
 	}
 
 	private void connect() {

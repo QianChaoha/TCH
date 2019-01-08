@@ -8,7 +8,7 @@ package com.uhf.uhf.http;
  */
 
 public class HttpUrl {
-    public static final String SERVER_URL = "http://ams.digihorns.com/";
+    public static final String SERVER_URL = "http://ams2.digihorns.com/";
 
     public static final String TOKEN_AUTH = "api/TokenAuth/Authenticate";
 

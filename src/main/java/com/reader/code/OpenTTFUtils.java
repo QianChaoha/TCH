@@ -22,8 +22,8 @@ import java.util.List;
  * @author: cqian
  */
 public class OpenTTFUtils {
-    private static SerialPort mSerialPort = null;
-    private static SerialPortFinder mSerialPortFinder;
+    public static SerialPort mSerialPort = null;
+    public static SerialPortFinder mSerialPortFinder;
 
     private static final String TTYS4 = "ttyS4 (rk_serial)";
     private static final int baud4 = 115200;
@@ -41,23 +41,15 @@ public class OpenTTFUtils {
             mPortList.add(lists[i]);
         }
     }
-
+    public static void closeUHF() {
+        if (mSerialPort != null)
+            mSerialPort.close();
+        mSerialPort = null;
+    }
     public static boolean openUHF(Context context) {
         if (!connect(context, baud4, TTYS4)) {
             return false;
         }
-//        try {
-//            if (!ModuleManager.newInstance().getScanStatus() && ModuleManager.newInstance().getUHFStatus())
-//                return true;
-//
-//            if (ModuleManager.newInstance().getScanStatus()) {
-//                ModuleManager.newInstance().setScanStatus(false);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Toast.makeText(context.getApplicationContext(), "摄像头被占用", Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
         if (!ModuleManager.newInstance().setUHFStatus(true)) {
             throw new RuntimeException("UHF RFID power on failure,may you open in other" +
                     " Process and do not exit it");
@@ -67,10 +59,6 @@ public class OpenTTFUtils {
 
 
     private static boolean connect(Context context, int port, String tty) {
-        if (mSerialPort != null)
-            mSerialPort.close();
-        mSerialPort = null;
-
 
         init();
 

@@ -157,6 +157,8 @@
         <activity android:name=".activity.SettingActivity" />
         <activity android:name=".activity.OperateTagActivity" />
         <activity android:name=".activity.GetDataActivity" />
+        <activity android:name=".activity.GetPlanActivity" />
+        <activity android:name=".activity.QunduActivity" />
 
     </application>
 

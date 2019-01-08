@@ -387,7 +387,8 @@ public class MainActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 //close the module
                                 ModuleManager.newInstance().setUHFStatus(false);
-                                getApplication().onTerminate();
+                               // getApplication().onTerminate();
+                                finish();
                             }
                         }).setNegativeButton(getString(R.string.cancel),
                 new DialogInterface.OnClickListener() {

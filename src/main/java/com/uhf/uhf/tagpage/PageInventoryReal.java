@@ -462,66 +462,34 @@ public class PageInventoryReal extends LinearLayout {
 				switch (btCmd) {
 				case CMD.REAL_TIME_INVENTORY:
 				case CMD.CUSTOMIZED_SESSION_TARGET_INVENTORY:
-					// if (new Date().getTime() - mRefreshTime > 2000) {
-					// refreshList();
-					// mRefreshTime = new Date().getTime();
-					// }
-					// add by lei.li 2016/11/04
-					// refreshStartStop(true);
-					// add by lei.li 2016/11/04
-					// Log.e("zhebian", "?????????????????????????????")
-					// add by lei.li 2016/11/14
 					if (!DEBUG) {
 						if (!mReaderHelper.getInventoryFlag()) {
 							if (!bTmpInventoryFlag) {
 								bTmpInventoryFlag = true;
 								mHandler.removeCallbacks(mRefreshRunnable);
 								mHandler.postDelayed(mRefreshRunnable, 2000);
-
-								// rm by lei.li 2016/11/04
-								// m_curInventoryBuffer.clearInventoryRealResult();
-								// mReaderHelper.clearInventoryTotal();
-								// Log.e("zhebian",
-								// "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 							}
 						}
 					}
 					mUpdateViewHandler.sendEmptyMessage(0);
-					// add by lei.li 2016/11/14
-					//refreshList();
-					// add by lei.li 2016/11/14
 
 					mHandler.removeCallbacks(mRefreshRunnable);
 					mHandler.postDelayed(mRefreshRunnable, 2000);
-					// add by lei.li 2016/11/14
 					mLoopHandler.removeCallbacks(mLoopRunnable);
 					mLoopHandler.postDelayed(mLoopRunnable, 2000);
-					//refreshText();
 					break;
 				case ReaderHelper.INVENTORY_ERR:
 				case ReaderHelper.INVENTORY_ERR_END:
 				case ReaderHelper.INVENTORY_END:
-					// add by lei.li have some problem why it was annotation
-					// refreshList();
-					//refreshList();
-					// add by lei.li
-					// add by lei.li 2016/11/
 					if (mReaderHelper.getInventoryFlag() /* || bTmpInventoryFlag */) {
 						mLoopHandler.removeCallbacks(mLoopRunnable);
 						mLoopHandler.postDelayed(mLoopRunnable, 2000);
 
 					} else {
 						mLoopHandler.removeCallbacks(mLoopRunnable);
-						// add by lei.li 2016/11/14
 						mHandler.removeCallbacks(mRefreshRunnable);
-						// add by lei.li 2016/11/14
 					}
 
-					// start_add by lei.li 2016/11/04
-					// refreshStartStop(false);
-					// end_add by lei.li 2016/11/04
-					// start_add by lei.li 2016/11/04
-					//refreshText(); // fixed by lei.li 2016/11/04
 					mUpdateViewHandler.sendEmptyMessage(0);
 					break;
 				}

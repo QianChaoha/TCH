@@ -50,7 +50,6 @@ public class HomeActivity extends BaseActivity {
     LoaddingUtils mLoaddingUtils;
 
 
-
     @Override
     protected int getLayoutId() {
         return R.layout.activity_home;
@@ -93,9 +92,14 @@ public class HomeActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet})
+    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet, R.id.btQun})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btQun:
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    startActivity(new Intent(this, QunduActivity.class));
+                }
+                break;
             case R.id.btGet:
                 if (OpenTTFUtils.openUHF(mActivity)) {
                     GetDataActivity.startGetDataActivity(this);
@@ -103,7 +107,7 @@ public class HomeActivity extends BaseActivity {
                 break;
             case R.id.btSetting:
                 //SettingActivity.startSettingActivity(this);
-                startActivity(new Intent(mActivity,ConnectRs232.class));
+                startActivity(new Intent(mActivity, ConnectRs232.class));
                 break;
             case R.id.btTagRw:
                 OpenScanUtils.openScan(mActivity);
@@ -114,4 +118,9 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getApplication().onTerminate();
+    }
 }

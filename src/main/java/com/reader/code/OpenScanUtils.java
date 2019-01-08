@@ -29,7 +29,6 @@ public class OpenScanUtils {
     private static final int baud1 = 9600;
 
 
-
     static String[] entryValues = null;
     private static List<String> mPortList = new ArrayList<String>();
     private static int mPosPort = -1;
@@ -43,23 +42,16 @@ public class OpenScanUtils {
         }
     }
 
+    public static void closeScan() {
+        if (mSerialPort != null)
+            mSerialPort.close();
+        mSerialPort = null;
+    }
 
     public static boolean openScan(Context context) {
         if (!connect(context, baud1, TTYS1)) {
             return false;
         }
-//        try {
-//            if (ModuleManager.newInstance().getScanStatus() && !ModuleManager.newInstance().getUHFStatus())
-//                return true;
-//
-//            if (ModuleManager.newInstance().getUHFStatus()) {
-//                ModuleManager.newInstance().setUHFStatus(false);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Toast.makeText(context.getApplicationContext(), "摄像头被占用", Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
         if (!ModuleManager.newInstance().setScanStatus(true)) {
             throw new RuntimeException("UHF RFID power on failure,may you open in other" +
                     " Process and do not exit it");

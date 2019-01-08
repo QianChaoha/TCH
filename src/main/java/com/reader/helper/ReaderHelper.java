@@ -1735,35 +1735,6 @@ public class ReaderHelper {
     }
 
     public void runLoopInventroy() {
-		/*
-		 * if ( m_curInventoryBuffer.nIndexAntenna <
-		 * m_curInventoryBuffer.lAntenna.size() - 1 ||
-		 * m_curInventoryBuffer.nCommond == 0) { if
-		 * (m_curInventoryBuffer.nCommond == 0) { m_curInventoryBuffer.nCommond
-		 * = 1;
-		 *
-		 * if (m_curInventoryBuffer.bLoopInventoryReal) { //m_bLockTab = true;
-		 * //btnInventory.Enabled = false; if
-		 * (m_curInventoryBuffer.bLoopCustomizedSession) {
-		 * //自定义Session和Inventoried Flag
-		 * mReader.customizedSessionTargetInventory(m_curReaderSetting.btReadId,
-		 * m_curInventoryBuffer.btSession, m_curInventoryBuffer.btTarget,
-		 * m_curInventoryBuffer.btRepeat); } else { //实时盘存
-		 * mReader.realTimeInventory(m_curReaderSetting.btReadId,
-		 * m_curInventoryBuffer.btRepeat);
-		 *
-		 * } } else if (m_curInventoryBuffer.bLoopInventory) {
-		 * mReader.inventory(m_curReaderSetting.btReadId,
-		 * m_curInventoryBuffer.btRepeat); } } else {
-		 * m_curInventoryBuffer.nCommond = 0;
-		 * m_curInventoryBuffer.nIndexAntenna++;
-		 *
-		 * byte btWorkAntenna =
-		 * m_curInventoryBuffer.lAntenna.get(m_curInventoryBuffer
-		 * .nIndexAntenna); mReader.setWorkAntenna(m_curReaderSetting.btReadId,
-		 * btWorkAntenna); m_curReaderSetting.btWorkAntenna = btWorkAntenna; } }
-		 * else
-		 */
         if (m_curInventoryBuffer.bLoopInventory
                 || m_curInventoryBuffer.bLoopInventoryReal) {
             m_curInventoryBuffer.nIndexAntenna = 0;
