@@ -171,7 +171,7 @@ public class TagRealList extends LinearLayout {
 	public final void refreshList() {
 		data.clear();
 		data.addAll(m_curInventoryBuffer.lsTagList);
-		mRealListAdapter.notifyDataSetChanged();
+		//mRealListAdapter.notifyDataSetChanged();
 		// add by lei.li 2016/11/12 this code 
 				/*if (mTagRealList.getChildCount() != 0) {
 					mTagsRealListScrollView.findViewById(R.id.tag_type)

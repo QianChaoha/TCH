@@ -60,10 +60,6 @@ public class OpenScanUtils {
     }
 
     private static boolean connect(Context context, int port, String tty) {
-        if (mSerialPort != null)
-            mSerialPort.close();
-        mSerialPort = null;
-
 
         init();
 

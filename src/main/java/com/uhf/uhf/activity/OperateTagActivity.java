@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +23,6 @@ import com.reader.base.CMD;
 import com.reader.base.ERROR;
 import com.reader.base.ReaderBase;
 import com.reader.base.StringTool;
-import com.reader.code.OpenScanUtils;
-import com.reader.code.OpenTTFUtils;
 import com.reader.code.helper.CodeReaderHelper;
 import com.reader.code.helper.TDCodeList;
 import com.reader.helper.ISO180006BOperateTagBuffer;
@@ -37,16 +34,8 @@ import com.reader.helper.TDCodeTagBuffer;
 import com.uhf.uhf.HexEditTextBox;
 import com.uhf.uhf.LogList;
 import com.uhf.uhf.R;
-import com.uhf.uhf.TagAccessList;
 import com.uhf.uhf.TagRealList;
-import com.uhf.uhf.spiner.AbstractSpinerAdapter;
-import com.uhf.uhf.spiner.SpinerPopWindow;
-import com.yzq.zxinglibrary.android.CaptureActivity;
-import com.yzq.zxinglibrary.common.Constant;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Description:
@@ -61,15 +50,8 @@ public class OperateTagActivity extends BaseActivity {
     private LogList mLogList;
     //fixed by lei.li 2016/11/09
 
-    private TextView mStartStop, mRead, mSelect, mWrite;
+    private TextView mRead, mWrite;
 
-    //private TextView mRefreshButton;
-
-    private TextView mTagAccessListText;
-    private TableRow mDropDownRow;
-
-    private List<String> mAccessList;
-    private SpinerPopWindow mSpinerPopWindow;
 
     private HexEditTextBox mPasswordEditText;
     private EditText mStartAddrEditText;
@@ -86,7 +68,7 @@ public class OperateTagActivity extends BaseActivity {
     private ReaderHelper mReaderHelper;
     private ReaderBase mReader;
 
-    private int mPos = -1;
+    private int mPos = 0;
 
     private static ReaderSetting m_curReaderSetting;
     private static InventoryBuffer m_curInventoryBuffer;
@@ -112,12 +94,22 @@ public class OperateTagActivity extends BaseActivity {
             mLoopHandler.postDelayed(this, 2000);
         }
     };
-
+    boolean mNotBrocestEpc;
     private Handler mUpdateViewHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             refreshText();
             refreshList();
+            if (m_curInventoryBuffer.lsTagList != null && m_curInventoryBuffer.lsTagList.size() > 0 && m_curInventoryBuffer.lsTagList.get(0) != null) {
+
+                startstop(false);
+                selectTag(mPos);
+                if (mNotBrocestEpc) {
+                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
+                } else {
+                    operateData(mPasswordBottom.getText().toString().toUpperCase(), 1, "");
+                }
+            }
         }
     };
 
@@ -125,9 +117,9 @@ public class OperateTagActivity extends BaseActivity {
         public void run() {
             refreshList();
             mHandler.postDelayed(this, 2000);
+
         }
     };
-
     public static void startOperateTagActivity(Context context) {
         Intent intent = new Intent(context, OperateTagActivity.class);
         context.startActivity(intent);
@@ -154,15 +146,14 @@ public class OperateTagActivity extends BaseActivity {
 
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
-            // mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
+            mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-//        m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
+        m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
 
-        mAccessList = new ArrayList<String>();
 
         m_curReaderSetting = mReaderHelper.getCurReaderSetting();
         m_curInventoryBuffer = mReaderHelper.getCurInventoryBuffer();
@@ -172,13 +163,9 @@ public class OperateTagActivity extends BaseActivity {
         mPasswordBottom = findViewById(R.id.password_text_bottom);
         mCodeTextBroad = findViewById(R.id.codeTextBroad);
         mLogList = (LogList) findViewById(R.id.log_list);
-        mStartStop = (TextView) findViewById(R.id.get);
         mRead = (TextView) findViewById(R.id.read);
-        mSelect = (TextView) findViewById(R.id.select);
         mWrite = (TextView) findViewById(R.id.write);
-        mStartStop.setOnClickListener(setAccessOnClickListener);
         mRead.setOnClickListener(setAccessOnClickListener);
-        mSelect.setOnClickListener(setAccessOnClickListener);
         mWrite.setOnClickListener(setAccessOnClickListener);
         findViewById(R.id.codeRead).setOnClickListener(setAccessOnClickListener);
         findViewById(R.id.codeWrite).setOnClickListener(setAccessOnClickListener);
@@ -194,9 +181,6 @@ public class OperateTagActivity extends BaseActivity {
 
         mGroupAccessAreaType = (RadioGroup) findViewById(R.id.group_access_area_type);
 
-        mTagAccessListText = (TextView) findViewById(R.id.tag_access_list_text);
-        mDropDownRow = (TableRow) findViewById(R.id.table_row_tag_access_list);
-
         mTagAccessList = (TagRealList) findViewById(R.id.tag_access_list);
 
         lbm = LocalBroadcastManager.getInstance(mContext);
@@ -208,27 +192,6 @@ public class OperateTagActivity extends BaseActivity {
         itent.addAction(CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE);
 
         lbm.registerReceiver(mRecv, itent);
-
-        mDropDownRow.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showSpinWindow();
-            }
-        });
-
-        mAccessList.clear();
-        mAccessList.add("Cancel");
-        for (int i = 0; i < m_curInventoryBuffer.lsTagList.size(); i++) {
-            mAccessList.add(m_curInventoryBuffer.lsTagList.get(i).strEPC);
-        }
-
-        mSpinerPopWindow = new SpinerPopWindow(mContext);
-        mSpinerPopWindow.refreshData(mAccessList, 0);
-        mSpinerPopWindow.setItemListener(new AbstractSpinerAdapter.IOnItemSelectListener() {
-            public void onItemClick(int pos) {
-                setAccessSelectText(pos);
-            }
-        });
-        refresh();
 
     }
 
@@ -242,10 +205,8 @@ public class OperateTagActivity extends BaseActivity {
     }
 
     public void refresh() {
-        mTagAccessListText.setText("");
-        mPos = -1;
+        mPos = 0;
 
-        mStartAddrEditText.setText("");
         mDataLenEditText.setText("");
         mDataEditText.setText("");
         mPasswordEditText.setText("");
@@ -255,40 +216,15 @@ public class OperateTagActivity extends BaseActivity {
         m_curOperateTagBuffer.clearBuffer();
 
         //add by lei.li 2017/1/16
-        mAccessList.clear();
         m_curInventoryBuffer.lsTagList.clear();
-        mAccessList.add("cancel");
         //add by lei.li 2017/1/16
         refreshList();
         refreshText();
         clearText();
     }
 
-    private void setAccessSelectText(int pos) {
-        if (pos >= 0 && pos < mAccessList.size()) {
-            String value = mAccessList.get(pos);
-            mTagAccessListText.setText(value);
-            mPos = pos;
-        }
-    }
 
-    private void showSpinWindow() {
-        //show tags readed by uhf
-        for (int i = 0; i < m_curInventoryBuffer.lsTagList.size(); i++) {
-            if (!mAccessList.contains(m_curInventoryBuffer.lsTagList.get(i).strEPC))
-                mAccessList.add(m_curInventoryBuffer.lsTagList.get(i).strEPC);
-        }
-        mSpinerPopWindow.refreshData(mAccessList, 0);
-        mSpinerPopWindow.setWidth(mDropDownRow.getWidth());
-        mSpinerPopWindow.showAsDropDown(mDropDownRow);
-    }
-
-    private void updateView() {
-        if (mPos < 0) mPos = 0;
-        setAccessSelectText(mPos);
-    }
-
-    private void startstop() {
+    private void startstop(boolean start) {
         bTmpInventoryFlag = false;
 
         m_curInventoryBuffer.clearInventoryPar();
@@ -322,22 +258,19 @@ public class OperateTagActivity extends BaseActivity {
         }
         m_curInventoryBuffer.bLoopCustomizedSession = false;
 
-        {
-            if (!mStartStop.getText().toString()
-                    .equals(getResources().getString(R.string.start_inventory))) {
-                refreshText();
-                mReaderHelper.setInventoryFlag(false);
-                m_curInventoryBuffer.bLoopInventoryReal = false;
+        if (!start) {
+            refreshText();
+            mReaderHelper.setInventoryFlag(false);
+            m_curInventoryBuffer.bLoopInventoryReal = false;
 
 
-                refreshStartStop(false);
-                mLoopHandler.removeCallbacks(mLoopRunnable);
-                mHandler.removeCallbacks(mRefreshRunnable);
-                refreshList();
-                return;
-            } else {
-                refreshStartStop(true);
-            }
+            refreshStartStop(false);
+            mLoopHandler.removeCallbacks(mLoopRunnable);
+            mHandler.removeCallbacks(mRefreshRunnable);
+            refreshList();
+            return;
+        } else {
+            refreshStartStop(true);
         }
 
         // start_fixed by lei.li 2016/11/04 problem
@@ -364,33 +297,27 @@ public class OperateTagActivity extends BaseActivity {
 
     @SuppressWarnings("deprecation")
     private void refreshStartStop(boolean start) {
-        if (start) {
-            mStartStop.setBackgroundDrawable(getResources().getDrawable(
-                    R.drawable.button_disenabled_background));
-            mStartStop.setText(getResources()
-                    .getString(R.string.stop_inventory));
-        } else {
-            mStartStop.setBackgroundDrawable(getResources().getDrawable(
-                    R.drawable.button_background));
-            mStartStop.setText(getResources().getString(
-                    R.string.start_inventory));
-        }
+//        if (start) {
+//            mStartStop.setBackgroundDrawable(getResources().getDrawable(
+//                    R.drawable.button_disenabled_background));
+//            mStartStop.setText(getResources()
+//                    .getString(R.string.stop_inventory));
+//        } else {
+//            mStartStop.setBackgroundDrawable(getResources().getDrawable(
+//                    R.drawable.button_background));
+//            mStartStop.setText(getResources().getString(
+//                    R.string.start_inventory));
+//        }
     }
 
     private View.OnClickListener setAccessOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
             switch (arg0.getId()) {
-                case R.id.get: {
-                    startstop();
-                    break;
-                }
-                case R.id.select: {
-                    selectTag(mPos);
-                    break;
-                }
                 case R.id.read:
-                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
+                    //operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
+                    mNotBrocestEpc = true;
+                    startstop(true);
                     setBtState(R.id.read, R.id.codeRead);
                     break;
                 case R.id.codeRead:
@@ -404,17 +331,13 @@ public class OperateTagActivity extends BaseActivity {
                     operateData(mPasswordEditText.getText().toString().toUpperCase(), 2, mCodeText.getText().toString().toUpperCase());
                     break;
                 case R.id.codeWriteBroad:
+
                     //循环写入
-                    if (mAccessList != null && mAccessList.size() > 0) {
-                        for (int i = 1; i < mAccessList.size(); i++) {
-                            selectTag(i);
-                            operateData(mPasswordBottom.getText().toString().toUpperCase(), 2, mCodeTextBroad.getText().toString().toUpperCase());
-                        }
-                    }
                     break;
                 case R.id.readBroad:
+                    mNotBrocestEpc = false;
+                    startstop(true);
                     setBtState(R.id.readBroad, R.id.codeReadBroad);
-                    operateData(mPasswordBottom.getText().toString().toUpperCase(), 1, mCodeTextBroad.getText().toString().toUpperCase());
                     break;
                 case R.id.codeReadBroad:
                     setBtState(R.id.codeReadBroad, R.id.readBroad);
@@ -435,7 +358,7 @@ public class OperateTagActivity extends BaseActivity {
             byte[] btAryEpc = null;
 
             try {
-                String[] result = StringTool.stringToStringArray(mAccessList.get(pos).toUpperCase(), 2);
+                String[] result = StringTool.stringToStringArray(m_curInventoryBuffer.lsTagList.get(0).strEPC.toUpperCase(), 2);
                 btAryEpc = StringTool.stringArrayToByteArray(result, result.length);
             } catch (Exception e) {
                 Toast.makeText(
@@ -592,14 +515,19 @@ public class OperateTagActivity extends BaseActivity {
 
                 switch (btCmd) {
                     case CMD.GET_ACCESS_EPC_MATCH:
-                        mTagAccessListText.setText(m_curOperateTagBuffer.strAccessEpcMatch);
+                        //mTagAccessListText.setText(m_curOperateTagBuffer.strAccessEpcMatch);
                         break;
                     case CMD.READ_TAG:
                         if (m_curOperateTagBuffer.lsTagList != null && m_curOperateTagBuffer.lsTagList.size() > 0) {
                             OperateTagBuffer.OperateTagMap operateTagMap = m_curOperateTagBuffer.lsTagList.get(0);
                             if (operateTagMap != null) {
                                 //operateTagMap.strData   读取的数据
-                                mDataEditText.setText(operateTagMap.strData);
+                                if (mNotBrocestEpc) {
+                                    mDataEditText.setText(operateTagMap.strData);
+                                } else {
+                                    //广播EPC
+                                    mCodeTextBroad.setText(operateTagMap.strData);
+                                }
                             }
                         }
                     case CMD.WRITE_TAG:
@@ -620,7 +548,7 @@ public class OperateTagActivity extends BaseActivity {
                                 mHandler.postDelayed(mRefreshRunnable, 2000);
                             }
                         }
-                        mUpdateViewHandler.sendEmptyMessage(0);
+                        mUpdateViewHandler.sendEmptyMessageDelayed(0, 50);
                         mHandler.removeCallbacks(mRefreshRunnable);
                         mHandler.postDelayed(mRefreshRunnable, 2000);
                         mLoopHandler.removeCallbacks(mLoopRunnable);
@@ -639,7 +567,7 @@ public class OperateTagActivity extends BaseActivity {
                             mHandler.removeCallbacks(mRefreshRunnable);
                         }
 
-                        mUpdateViewHandler.sendEmptyMessage(0);
+                        mUpdateViewHandler.sendEmptyMessageDelayed(0, 50);
                         break;
                 }
 
@@ -649,9 +577,8 @@ public class OperateTagActivity extends BaseActivity {
                         intent.getIntExtra("type", ERROR.SUCCESS));
             } else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
-                mTagRealBCList.refreshList();
-                if (mTagRealBCList.mData_BD != null && mTagRealBCList.mData_BD.size() > 0) {
-                    mCodeText.setText(mTagRealBCList.mData_BD.get(0).mBarCodeValue);
+                if (m_curOperateBinDCodeTagbuffer.getIsTagList() != null && m_curOperateBinDCodeTagbuffer.getIsTagList().size() > 0) {
+                    mCodeText.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
                 }
             }
         }
@@ -716,7 +643,7 @@ public class OperateTagActivity extends BaseActivity {
             lbm.unregisterReceiver(mRecv);
 
         m_curInventoryBuffer.clearInventoryRealResult();
-
+        m_curOperateBinDCodeTagbuffer.clearBuffer();
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
 
@@ -724,5 +651,6 @@ public class OperateTagActivity extends BaseActivity {
         Beeper.release();
 
         ModuleManager.newInstance().setUHFStatus(false);
+        ModuleManager.newInstance().setScanStatus(false);
     }
 }
