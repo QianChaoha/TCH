@@ -652,5 +652,6 @@ public class OperateTagActivity extends BaseActivity {
 
         ModuleManager.newInstance().setUHFStatus(false);
         ModuleManager.newInstance().setScanStatus(false);
+
     }
 }

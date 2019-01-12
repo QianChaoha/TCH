@@ -8,9 +8,10 @@ import java.util.List;
  *
  * @author: cqian
  */
-public class UploadPanDataBean {
+public class UploadJsPanDataBean {
 
-    public int id;
+    public String name;
+    public String note;
     public List<AssetDetailsBean> assetCheckDetail;
 
     public static class AssetDetailsBean {

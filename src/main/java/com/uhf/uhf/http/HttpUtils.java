@@ -41,7 +41,9 @@ public class HttpUtils {
         LogUtils.debug("═══════════════════════════════════════url═════════════════════════════════════════════");
         LogUtils.debug(HttpUrl.SERVER_URL + url);
         LogUtils.debug("═══════════════════════════════════════headers═════════════════════════════════════════════");
-
+        if (UHFApplication.mUserBean != null) {
+            headers.put("Authorization", "Bearer " + UHFApplication.mUserBean.accessToken);
+        }
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             entry.getKey();
             entry.getValue();
@@ -67,7 +69,7 @@ public class HttpUtils {
 
                     @Override
                     public void onError(ANError e) {
-                        if (e != null && e.getErrorDetail()!= null) {
+                        if (e != null && e.getErrorDetail() != null) {
                             LogUtils.debug("══════════════════════════════════════Novate.Throwable═══════════════════════════════════════════");
                             LogUtils.debug(e.getErrorDetail());
                             Throwable throwable = new Throwable(e.getCause(), e.getErrorCode() + "", e.getErrorDetail());
@@ -77,7 +79,8 @@ public class HttpUtils {
                 });
 
     }
-    public static void doGet(String url, Map<String, String> map, final CallBack callBack) {
+
+    public static void doGet(String url, Map<String, Object> map, final CallBack callBack) {
         mCurrentUrl = url;
         LogUtils.debug("═══════════════════════════════════════url═════════════════════════════════════════════");
         LogUtils.debug(HttpUrl.SERVER_URL + url);
@@ -91,9 +94,9 @@ public class HttpUtils {
             LogUtils.debug(entry.getKey() + ":" + entry.getValue());
         }
 
-        if (map!=null){
+        if (map != null) {
             LogUtils.debug("═══════════════════════════════════════请求参数═════════════════════════════════════════════");
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
                 entry.getKey();
                 entry.getValue();
                 LogUtils.debug(entry.getKey() + ":" + entry.getValue());
@@ -102,7 +105,7 @@ public class HttpUtils {
 
         AndroidNetworking.get(HttpUrl.SERVER_URL + url)
                 .addHeaders(headers)
-                .addPathParameter(map)
+                .addQueryParameter(map)
                 .setTag(url)
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -114,7 +117,7 @@ public class HttpUtils {
 
                     @Override
                     public void onError(ANError e) {
-                        if (e != null && e.getErrorDetail()!= null) {
+                        if (e != null && e.getErrorDetail() != null) {
                             LogUtils.debug("══════════════════════════════════════Novate.Throwable═══════════════════════════════════════════");
                             LogUtils.debug(e.getErrorDetail());
                             Throwable throwable = new Throwable(e.getCause(), e.getErrorCode() + "", e.getErrorDetail());

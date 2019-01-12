@@ -24,11 +24,17 @@ public abstract class CallBack<T> {
 
     public void parseData(String responseData) {
         mResponseData = responseData;
-        LogUtils.debug("═══════════════════════════════════════返回值═════════════════════════════════════════════");
-        LogUtils.debug(responseData);
-        Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        T t = JsonParserUtil.deserializeByJson(responseData, entityClass);
-        onSuccess(t);
+        try{
+            LogUtils.debug("═══════════════════════════════════════返回值═════════════════════════════════════════════");
+            LogUtils.debug(responseData);
+            Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+            T t = JsonParserUtil.deserializeByJson(responseData, entityClass);
+            onSuccess(t);
+        }catch (Exception e){
+            Throwable throwable=new Throwable(null,"");
+            onFailed(throwable);
+        }
+
     }
 
 }

@@ -10,13 +10,17 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
+import com.example.administrator.baselib.interfaces.BaseDialogInterface;
 import com.example.administrator.baselib.util.JsonParserUtil;
+import com.example.administrator.baselib.view.dialog.CommenDialog;
+import com.nativec.tools.ModuleManager;
 import com.reader.base.CMD;
 import com.reader.base.ReaderBase;
 import com.reader.helper.InventoryBuffer;
@@ -26,14 +30,17 @@ import com.tamic.novate.Throwable;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagRealList;
 import com.uhf.uhf.adapter.GetPanAdapter;
-import com.uhf.uhf.bean.AssertBean;
 import com.uhf.uhf.bean.AssertItemBean;
+import com.uhf.uhf.bean.GetAssetCheckDetailsBean;
+import com.uhf.uhf.bean.UploadJsPanDataBean;
 import com.uhf.uhf.bean.UploadPanDataBean;
 import com.uhf.uhf.bean.UploadResultBean;
 import com.uhf.uhf.http.CallBack;
 import com.uhf.uhf.http.HttpUrl;
 import com.uhf.uhf.http.HttpUtils;
+import com.uhf.uhf.util.InputPanDialog;
 import com.uhf.uhf.util.LoaddingUtils;
+import com.uhf.uhf.util.SharedPreferencesUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +50,8 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+
+import static com.uhf.uhf.util.SharedPreferencesUtils.GET_PAN_DATA;
 
 /**
  * Description:
@@ -63,7 +72,10 @@ public class GetDataActivity extends BaseActivity {
     private ReaderHelper mReaderHelper;
     private LocalBroadcastManager lbm;
     private boolean mStart;
-    private AssertBean.ResultBean mResultBean;
+    private GetAssetCheckDetailsBean mCheckDetailsBean;
+    CommenDialog mCommenDialog;
+    private UploadPanDataBean mUploadPanDataBean;
+    private UploadJsPanDataBean mUploadJsPanDataBean;
 
     public static void startGetDataActivity(Context context) {
         Intent intent = new Intent(context, GetDataActivity.class);
@@ -87,13 +99,6 @@ public class GetDataActivity extends BaseActivity {
     private Handler mLoopHandler = new Handler();
     private Runnable mLoopRunnable = new Runnable() {
         public void run() {
-            /*
-             * byte btWorkAntenna =
-             * m_curInventoryBuffer.lAntenna.get(m_curInventoryBuffer
-             * .nIndexAntenna); if (btWorkAntenna < 0) btWorkAntenna = 0;
-             * mReader.setWorkAntenna(m_curReaderSetting.btReadId,
-             * btWorkAntenna);
-             */
             mReaderHelper.runLoopInventroy();
             mLoopHandler.postDelayed(this, 2000);
         }
@@ -105,7 +110,7 @@ public class GetDataActivity extends BaseActivity {
     private String mStrRepeat = "1";
     private static ReaderSetting m_curReaderSetting;
     private ReaderBase mReader;
-    boolean mSave = false;
+    boolean mHasData = false;//没有盘点计划数据
 
     @Override
     protected void onResume() {
@@ -116,14 +121,58 @@ public class GetDataActivity extends BaseActivity {
         super.onResume();
     }
 
+    InputPanDialog mInputPanDialog;
+
     @Override
     protected void initView() {
+        mCommenDialog = new CommenDialog(mActivity);
+        mCommenDialog.setBottomOneButton();
+        mCommenDialog.setDialogInterface(new BaseDialogInterface() {
+            @Override
+            public void ok(View view) {
+                uploadData();
+                mCommenDialog.dismiss();
+            }
+
+            @Override
+            public void cancle(View view) {
+                mCommenDialog.dismiss();
+            }
+        });
+        mCommenDialog.setTitle("提示");
+
+
+        mInputPanDialog = new InputPanDialog(mActivity);
+        mInputPanDialog.setBottomOneButton();
+        mInputPanDialog.setDialogInterface(new BaseDialogInterface() {
+            @Override
+            public void ok(View view) {
+                if (mInputPanDialog.checkData()) {
+                    mUploadJsPanDataBean = new UploadJsPanDataBean();
+                    mUploadJsPanDataBean.name = mInputPanDialog.getInputName();
+                    mUploadJsPanDataBean.note = mInputPanDialog.getMark();
+                    mUploadJsPanDataBean.assetCheckDetail = new ArrayList<>();
+                    for (int i = 0; i < mDatas.size(); i++) {
+                        mUploadJsPanDataBean.assetCheckDetail.add(new UploadJsPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
+                    }
+                    uploadJsData();
+                } else {
+                    Toast.makeText(mActivity, "请输入盘点名称", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void cancle(View view) {
+                mInputPanDialog.dismiss();
+            }
+        });
+        mInputPanDialog.setTitle("提示");
+
         mGetPanAdapter = new GetPanAdapter(mActivity, mDatas);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mGetPanAdapter);
         mLoaddingUtils = new LoaddingUtils(mActivity);
-        mLoaddingUtils.show();
-
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
@@ -141,27 +190,21 @@ public class GetDataActivity extends BaseActivity {
         lbm.registerReceiver(mRecv, itent);
     }
 
-    @Override
-    protected void setViewData() {
+    private void uploadJsData() {
+        mLoaddingUtils.show();
 
-    }
-
-    @Override
-    protected void getData() {
-
-        HttpUtils.doGet(HttpUrl.GET_ASSERT, null, new CallBack<AssertBean>() {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(JsonParserUtil.serializeToJson(mUploadJsPanDataBean));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HttpUtils.doPost(HttpUrl.UploadRealTimeAssetCheck, jsonObject, new CallBack<UploadResultBean>() {
             @Override
-            public void onSuccess(AssertBean data) {
+            public void onSuccess(UploadResultBean data) {
                 mLoaddingUtils.dismiss();
-                if (data != null && data.result != null && data.result.size() > 0) {
-                    mResultBean = data.result.get(0);
-                    if (mResultBean != null && mResultBean.assetCheckDetails != null) {
-                        for (int i = 0; i < mResultBean.assetCheckDetails.size() && mResultBean.assetCheckDetails.get(i) != null; i++) {
-                            mDatas.add(new AssertItemBean(mResultBean.assetCheckDetails.get(i).assetCode, "", "", 3,
-                                    mResultBean.assetCheckDetails.get(i).id, mResultBean.assetCheckDetails.get(i).assetId));
-                        }
-                        mGetPanAdapter.notifyDataSetChanged();
-                    }
+                if (data != null && data.result != null && data.result.isSuccessful) {
+                    Toast.makeText(mActivity, "上传成功", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -169,57 +212,140 @@ public class GetDataActivity extends BaseActivity {
             public void onFailed(Throwable e) {
                 mLoaddingUtils.dismiss();
             }
-
         });
     }
 
-    @OnClick({R.id.btPd, R.id.tvSave, R.id.tvUpload})
+    @Override
+    protected void setViewData() {
+
+    }
+
+    @Override
+    protected void getData() {
+        mDatas.clear();
+        String data = SharedPreferencesUtils.getString(mActivity, GET_PAN_DATA, "");
+        mCheckDetailsBean = null;
+        if (!TextUtils.isEmpty(data)) {
+            try {
+                mCheckDetailsBean = JsonParserUtil.deserializeByJson(data, GetAssetCheckDetailsBean.class);
+                //============================CheckDetailsBean.id默认为0吗==============================
+                if (mCheckDetailsBean != null && mCheckDetailsBean.id != 0) {
+                    mHasData = true;
+                }
+            } catch (Exception e) {
+            }
+        }
+        if (mCheckDetailsBean != null && mCheckDetailsBean.result != null && mCheckDetailsBean.result.size() > 0) {
+
+            for (int i = 0; i < mCheckDetailsBean.result.size() && mCheckDetailsBean.result.get(i) != null; i++) {
+                mDatas.add(new AssertItemBean(mCheckDetailsBean.result.get(i).assetCode, "", "", mCheckDetailsBean.result.get(i).state,
+                        mCheckDetailsBean.id, mCheckDetailsBean.result.get(i).assetId));
+            }
+        }
+        mGetPanAdapter.notifyDataSetChanged();
+    }
+
+    @OnClick({R.id.btPd, R.id.tvSave, R.id.tvUpload, R.id.btGetPlan, R.id.btClean})
     public void click(View view) {
         switch (view.getId()) {
+            case R.id.tvSave:
+
+                GetAssetCheckDetailsBean detailsBean = new GetAssetCheckDetailsBean();
+                detailsBean.result = new ArrayList<>();
+                if (mCheckDetailsBean != null) {
+                    detailsBean.id = mCheckDetailsBean.id;
+                }
+                for (int i = 0; i < mDatas.size() && mDatas.get(i) != null; i++) {
+                    AssertItemBean assertItemBean = mDatas.get(i);
+                    detailsBean.result.add(new GetAssetCheckDetailsBean.ResultBean(assertItemBean.epcData, assertItemBean.count, assertItemBean.rssi, assertItemBean.state, assertItemBean.assetId));
+                }
+                mCheckDetailsBean = detailsBean;
+                String string = JsonParserUtil.serializeToJson(detailsBean);
+                SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, string);
+                Toast.makeText(mActivity, "保存成功", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btClean:
+                if (mStart) {
+                    startstop();
+                }
+                SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
+                mRecyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getData();
+                    }
+                }, 500);
+                break;
+            case R.id.btGetPlan:
+                startActivityForResult(new Intent(mActivity, GetPlanActivity.class), 1);
+                break;
             case R.id.btPd:
                 startstop();
                 break;
             case R.id.tvUpload:
                 // 0 待盘点,1 正常,2 盘盈,3 盘亏
-                if (!mSave) {
+                if (mStart) {
+                    //正在盘点
                     Toast.makeText(mActivity, "尚未开始盘点或者盘点未结束", Toast.LENGTH_LONG).show();
                 } else {
-                    if (mResultBean != null) {
-                        mLoaddingUtils.show();
-                        UploadPanDataBean uploadPanDataBean = new UploadPanDataBean();
-                        uploadPanDataBean.id = mResultBean.id;
-                        uploadPanDataBean.name = mResultBean.name;
-                        uploadPanDataBean.AssetCheckDetails = new ArrayList<>();
+                    if (mCheckDetailsBean != null && mCheckDetailsBean.id != 0) {
+                        mUploadPanDataBean = new UploadPanDataBean();
+                        mUploadPanDataBean.id = mCheckDetailsBean.id;
+                        mUploadPanDataBean.assetCheckDetail = new ArrayList<>();
+                        int count = 0;
                         for (int i = 0; i < mDatas.size(); i++) {
-                            uploadPanDataBean.AssetCheckDetails.add(new UploadPanDataBean.AssetDetailsBean(mDatas.get(i).id,
-                                    mDatas.get(i).assetId, mDatas.get(i).epcData, mDatas.get(i).state));
-                        }
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(JsonParserUtil.serializeToJson(uploadPanDataBean));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        HttpUtils.doPost(HttpUrl.UPLOAD_ASSERT, jsonObject, new CallBack<UploadResultBean>() {
-                            @Override
-                            public void onSuccess(UploadResultBean data) {
-                                mLoaddingUtils.dismiss();
-                                if (data != null && data.result != null && data.result.isSuccessful) {
-                                    Toast.makeText(mActivity, "上传成功", Toast.LENGTH_SHORT).show();
-                                }
+                            mUploadPanDataBean.assetCheckDetail.add(new UploadPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
+                            if (TextUtils.isEmpty(mDatas.get(i).count)) {
+                                count = count + 1;
                             }
+                        }
+                        if (mUploadPanDataBean.assetCheckDetail.size() == 0) {
+                            Toast.makeText(mActivity, "没有数据可以上传", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (count > 0) {
+                                mCommenDialog.setContent("还有" + count + "条计划未盘点,确定上传吗?");
+                            } else {
+                                mCommenDialog.setContent("确定上传吗?");
+                            }
+                            mCommenDialog.show();
+                        }
 
-                            @Override
-                            public void onFailed(Throwable e) {
-                                mLoaddingUtils.dismiss();
-                            }
-                        });
+                    } else {
+                        //即时盘点
+                        if (mDatas.size() == 0) {
+                            Toast.makeText(mActivity, "没有数据可以上传", Toast.LENGTH_SHORT).show();
+                        } else {
+                            mInputPanDialog.show();
+                        }
                     }
-
-
                 }
                 break;
         }
+    }
+
+    private void uploadData() {
+        mLoaddingUtils.show();
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(JsonParserUtil.serializeToJson(mUploadPanDataBean));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HttpUtils.doPost(HttpUrl.UPLOAD_ASSERT, jsonObject, new CallBack<UploadResultBean>() {
+            @Override
+            public void onSuccess(UploadResultBean data) {
+                mLoaddingUtils.dismiss();
+                if (data != null && data.result != null && data.result.isSuccessful) {
+                    Toast.makeText(mActivity, "上传成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailed(Throwable e) {
+                mLoaddingUtils.dismiss();
+            }
+        });
     }
 
     private void startstop() {
@@ -302,7 +428,6 @@ public class GetDataActivity extends BaseActivity {
         } else {
             mStartStop.setText("盘点");
             mTvLogDetail.setText("盘点中结束");
-            mSave = true;
         }
     }
 
@@ -324,16 +449,11 @@ public class GetDataActivity extends BaseActivity {
                             }
                         }
                         mUpdateViewHandler.sendEmptyMessage(0);
-                        // add by lei.li 2016/11/14
-                        //refreshList();
-                        // add by lei.li 2016/11/14
 
                         mHandler.removeCallbacks(mRefreshRunnable);
                         mHandler.postDelayed(mRefreshRunnable, 2000);
-                        // add by lei.li 2016/11/14
                         mLoopHandler.removeCallbacks(mLoopRunnable);
                         mLoopHandler.postDelayed(mLoopRunnable, 2000);
-                        //refreshText();
                         break;
                     case ReaderHelper.INVENTORY_ERR:
                     case ReaderHelper.INVENTORY_ERR_END:
@@ -360,8 +480,8 @@ public class GetDataActivity extends BaseActivity {
     private void refreshList() {
         //可以得出盘点到和盘盈的数据
         mTagAccessList.refreshList();
-        if (mDatas != null && mDatas.size() > 0 ) {
-            if (mTagAccessList.data != null && mTagAccessList.data.size() > 0){
+        if (mDatas != null) {
+            if (mTagAccessList.data != null && mTagAccessList.data.size() > 0) {
                 for (int j = 0; j < mTagAccessList.data.size(); j++) {
                     InventoryBuffer.InventoryTagMap inventoryTagMap = mTagAccessList.data.get(j);
                     if (inventoryTagMap != null) {
@@ -380,8 +500,13 @@ public class GetDataActivity extends BaseActivity {
 
                         }
                         if (!temp) {
-                            //多出的标签--盘盈
-                            mDatas.add(new AssertItemBean(inventoryTagMap.strEPC, inventoryTagMap.nReadCount + "", inventoryTagMap.strRSSI, 2, 0, 0));
+                            //有服务器id  多出的标签--盘盈
+                            if (mHasData) {
+                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ",""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 2, 0, 0));
+                            } else {
+                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ",""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 0, 0, 0));
+                            }
+
                         }
                     }
 
@@ -408,19 +533,27 @@ public class GetDataActivity extends BaseActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            getData();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
+
         if (lbm != null)
             lbm.unregisterReceiver(mRecv);
 
+        m_curInventoryBuffer.clearInventoryRealResult();
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
+
+
         Beeper.release();
-        if (mReader != null) {
-            if (mReader.IsAlive())
-                mReader.signOut();
-        }
+
+        ModuleManager.newInstance().setUHFStatus(false);
     }
 
     @Override

@@ -107,7 +107,7 @@ public class HomeActivity extends BaseActivity {
                 break;
             case R.id.btSetting:
                 //SettingActivity.startSettingActivity(this);
-                startActivity(new Intent(mActivity, ConnectRs232.class));
+                //startActivity(new Intent(mActivity, ConnectRs232.class));
                 break;
             case R.id.btTagRw:
                 OpenScanUtils.openScan(mActivity);
