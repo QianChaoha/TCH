@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
+import com.example.administrator.baselib.util.TopTitleUtils;
 import com.nativec.tools.ModuleManager;
 import com.reader.base.CMD;
 import com.reader.base.ERROR;
@@ -143,7 +144,7 @@ public class OperateTagActivity extends BaseActivity {
     @Override
     protected void initView() {
         mContext = this;
-
+        new TopTitleUtils(this).setTitle("标签读写").setLeft(null);;
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
             mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();

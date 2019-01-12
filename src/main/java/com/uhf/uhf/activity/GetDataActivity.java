@@ -19,10 +19,12 @@ import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
 import com.example.administrator.baselib.interfaces.BaseDialogInterface;
 import com.example.administrator.baselib.util.JsonParserUtil;
+import com.example.administrator.baselib.util.TopTitleUtils;
 import com.example.administrator.baselib.view.dialog.CommenDialog;
 import com.nativec.tools.ModuleManager;
 import com.reader.base.CMD;
 import com.reader.base.ReaderBase;
+import com.reader.code.OpenTTFUtils;
 import com.reader.helper.InventoryBuffer;
 import com.reader.helper.ReaderHelper;
 import com.reader.helper.ReaderSetting;
@@ -51,6 +53,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.uhf.uhf.activity.HomeActivity.CLEAN_DATA_TIME;
 import static com.uhf.uhf.util.SharedPreferencesUtils.GET_PAN_DATA;
 
 /**
@@ -114,6 +117,23 @@ public class GetDataActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
+        OpenTTFUtils.openUHF(mActivity);
+        try {
+            mReaderHelper = ReaderHelper.getDefaultHelper();
+            mReader = mReaderHelper.getReader();
+        } catch (Exception e) {
+        }
+        m_curInventoryBuffer = mReaderHelper.getCurInventoryBuffer();
+        m_curReaderSetting = mReaderHelper.getCurReaderSetting();
+
+
+        lbm = LocalBroadcastManager.getInstance(mActivity);
+
+        IntentFilter itent = new IntentFilter();
+        itent.addAction(ReaderHelper.BROADCAST_WRITE_LOG);
+        itent.addAction(ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL);
+        lbm.registerReceiver(mRecv, itent);
+
         if (mReader != null) {
             if (!mReader.IsAlive())
                 mReader.StartWait();
@@ -125,8 +145,8 @@ public class GetDataActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        new TopTitleUtils(this).setTitle("批量盘点").setLeft(null);
         mCommenDialog = new CommenDialog(mActivity);
-        mCommenDialog.setBottomOneButton();
         mCommenDialog.setDialogInterface(new BaseDialogInterface() {
             @Override
             public void ok(View view) {
@@ -151,9 +171,9 @@ public class GetDataActivity extends BaseActivity {
                     mUploadJsPanDataBean = new UploadJsPanDataBean();
                     mUploadJsPanDataBean.name = mInputPanDialog.getInputName();
                     mUploadJsPanDataBean.note = mInputPanDialog.getMark();
-                    mUploadJsPanDataBean.assetCheckDetail = new ArrayList<>();
+                    mUploadJsPanDataBean.assetCheckDetails = new ArrayList<>();
                     for (int i = 0; i < mDatas.size(); i++) {
-                        mUploadJsPanDataBean.assetCheckDetail.add(new UploadJsPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
+                        mUploadJsPanDataBean.assetCheckDetails.add(new UploadJsPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
                     }
                     uploadJsData();
                 } else {
@@ -173,21 +193,7 @@ public class GetDataActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mGetPanAdapter);
         mLoaddingUtils = new LoaddingUtils(mActivity);
-        try {
-            mReaderHelper = ReaderHelper.getDefaultHelper();
-            mReader = mReaderHelper.getReader();
-        } catch (Exception e) {
-        }
-        m_curInventoryBuffer = mReaderHelper.getCurInventoryBuffer();
-        m_curReaderSetting = mReaderHelper.getCurReaderSetting();
 
-
-        lbm = LocalBroadcastManager.getInstance(mActivity);
-
-        IntentFilter itent = new IntentFilter();
-        itent.addAction(ReaderHelper.BROADCAST_WRITE_LOG);
-        itent.addAction(ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL);
-        lbm.registerReceiver(mRecv, itent);
     }
 
     private void uploadJsData() {
@@ -203,14 +209,21 @@ public class GetDataActivity extends BaseActivity {
             @Override
             public void onSuccess(UploadResultBean data) {
                 mLoaddingUtils.dismiss();
+                if (mInputPanDialog != null) {
+                    mInputPanDialog.dismiss();
+                }
                 if (data != null && data.result != null && data.result.isSuccessful) {
                     Toast.makeText(mActivity, "上传成功", Toast.LENGTH_SHORT).show();
                 }
+                cleanData();
             }
 
             @Override
             public void onFailed(Throwable e) {
                 mLoaddingUtils.dismiss();
+                if (mInputPanDialog != null) {
+                    mInputPanDialog.dismiss();
+                }
             }
         });
     }
@@ -265,16 +278,8 @@ public class GetDataActivity extends BaseActivity {
                 Toast.makeText(mActivity, "保存成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btClean:
-                if (mStart) {
-                    startstop();
-                }
-                SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
-                mRecyclerView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getData();
-                    }
-                }, 500);
+                cleanData();
+
                 break;
             case R.id.btGetPlan:
                 startActivityForResult(new Intent(mActivity, GetPlanActivity.class), 1);
@@ -291,15 +296,15 @@ public class GetDataActivity extends BaseActivity {
                     if (mCheckDetailsBean != null && mCheckDetailsBean.id != 0) {
                         mUploadPanDataBean = new UploadPanDataBean();
                         mUploadPanDataBean.id = mCheckDetailsBean.id;
-                        mUploadPanDataBean.assetCheckDetail = new ArrayList<>();
+                        mUploadPanDataBean.assetCheckDetails = new ArrayList<>();
                         int count = 0;
                         for (int i = 0; i < mDatas.size(); i++) {
-                            mUploadPanDataBean.assetCheckDetail.add(new UploadPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
+                            mUploadPanDataBean.assetCheckDetails.add(new UploadPanDataBean.AssetDetailsBean(mDatas.get(i).epcData));
                             if (TextUtils.isEmpty(mDatas.get(i).count)) {
                                 count = count + 1;
                             }
                         }
-                        if (mUploadPanDataBean.assetCheckDetail.size() == 0) {
+                        if (mUploadPanDataBean.assetCheckDetails.size() == 0) {
                             Toast.makeText(mActivity, "没有数据可以上传", Toast.LENGTH_SHORT).show();
                         } else {
                             if (count > 0) {
@@ -323,6 +328,22 @@ public class GetDataActivity extends BaseActivity {
         }
     }
 
+    private void cleanData() {
+        if (mStart) {
+            startstop();
+            SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
+            mRecyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getData();
+                }
+            }, CLEAN_DATA_TIME);
+        }else {
+            SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
+            getData();
+        }
+    }
+
     private void uploadData() {
         mLoaddingUtils.show();
 
@@ -339,6 +360,7 @@ public class GetDataActivity extends BaseActivity {
                 if (data != null && data.result != null && data.result.isSuccessful) {
                     Toast.makeText(mActivity, "上传成功", Toast.LENGTH_SHORT).show();
                 }
+                cleanData();
             }
 
             @Override
@@ -487,7 +509,7 @@ public class GetDataActivity extends BaseActivity {
                     if (inventoryTagMap != null) {
                         boolean temp = false;
                         for (int i = 0; i < mDatas.size(); i++) {
-                            if (mDatas.get(i).epcData != null && mDatas.get(i).epcData.equals(inventoryTagMap.strEPC)) {
+                            if (mDatas.get(i).epcData != null && mDatas.get(i).epcData.equals(inventoryTagMap.strEPC.replace(" ", ""))) {
                                 mDatas.get(i).count = inventoryTagMap.nReadCount + "";
                                 mDatas.get(i).rssi =
                                         (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm";
@@ -502,9 +524,9 @@ public class GetDataActivity extends BaseActivity {
                         if (!temp) {
                             //有服务器id  多出的标签--盘盈
                             if (mHasData) {
-                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ",""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 2, 0, 0));
+                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ", ""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 2, 0, 0));
                             } else {
-                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ",""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 0, 0, 0));
+                                mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ", ""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 0, 0, 0));
                             }
 
                         }
@@ -540,9 +562,8 @@ public class GetDataActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
+    protected void onStop() {
+        super.onStop();
         if (lbm != null)
             lbm.unregisterReceiver(mRecv);
 
@@ -555,6 +576,7 @@ public class GetDataActivity extends BaseActivity {
 
         ModuleManager.newInstance().setUHFStatus(false);
     }
+
 
     @Override
     protected int getLayoutId() {

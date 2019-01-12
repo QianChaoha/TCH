@@ -12,7 +12,7 @@ public class UploadJsPanDataBean {
 
     public String name;
     public String note;
-    public List<AssetDetailsBean> assetCheckDetail;
+    public List<AssetDetailsBean> assetCheckDetails;
 
     public static class AssetDetailsBean {
         public AssetDetailsBean(String assetCode) {

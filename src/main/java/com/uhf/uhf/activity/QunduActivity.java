@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
 import com.example.administrator.baselib.util.JsonParserUtil;
+import com.example.administrator.baselib.util.TopTitleUtils;
 import com.nativec.tools.ModuleManager;
 import com.reader.base.CMD;
 import com.reader.base.ReaderBase;
@@ -38,6 +39,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.uhf.uhf.activity.HomeActivity.CLEAN_DATA_TIME;
 import static com.uhf.uhf.util.SharedPreferencesUtils.GET_PAN_DATA;
 
 /**
@@ -98,6 +100,7 @@ public class QunduActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        new TopTitleUtils(this).setTitle("群读").setLeft(null);;
         mGetPanAdapter = new GetPanAdapter(mActivity, mDatas);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mGetPanAdapter);
@@ -134,20 +137,24 @@ public class QunduActivity extends BaseActivity {
             case R.id.btClean:
                 if (mStart) {
                     startstop();
+                    mRecyclerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDatas.clear();
+                            mGetPanAdapter.notifyDataSetChanged();
+                        }
+                    }, CLEAN_DATA_TIME);
+                }else {
+                    mDatas.clear();
+                    mGetPanAdapter.notifyDataSetChanged();
                 }
-                SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
-                mRecyclerView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getData();
-                    }
-                }, 500);
                 break;
             case R.id.btPd:
                 startstop();
                 break;
         }
     }
+
     private void startstop() {
         bTmpInventoryFlag = false;
 
@@ -219,6 +226,7 @@ public class QunduActivity extends BaseActivity {
         mHandler.removeCallbacks(mRefreshRunnable);
         mHandler.postDelayed(mRefreshRunnable, 2000);
     }
+
     private void refreshStartStop(boolean start) {
         mStart = start;
         if (start) {
@@ -229,6 +237,7 @@ public class QunduActivity extends BaseActivity {
             mTvLogDetail.setText("盘点中结束");
         }
     }
+
     private final BroadcastReceiver mRecv = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -280,11 +289,22 @@ public class QunduActivity extends BaseActivity {
         mTagAccessList.refreshList();
         if (mDatas != null) {
             if (mTagAccessList.data != null && mTagAccessList.data.size() > 0) {
+
                 for (int j = 0; j < mTagAccessList.data.size(); j++) {
                     InventoryBuffer.InventoryTagMap inventoryTagMap = mTagAccessList.data.get(j);
                     if (inventoryTagMap != null) {
-                        mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ", ""),
-                                inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 0, 0, 0));
+                        boolean temp = false;
+                        for (int i = 0; i < mDatas.size(); i++) {
+                            if (mDatas.get(i).epcData != null && mDatas.get(i).epcData.equals(inventoryTagMap.strEPC.replace(" ", ""))) {
+                                mDatas.get(i).count = inventoryTagMap.nReadCount + "";
+                                mDatas.get(i).rssi =
+                                        (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm";
+                                temp = true;
+                            }
+                        }
+                        if (!temp) {
+                            mDatas.add(new AssertItemBean(inventoryTagMap.strEPC.replace(" ", ""), inventoryTagMap.nReadCount + "", (Integer.parseInt(inventoryTagMap.strRSSI) - 129) + "dBm", 0, 0, 0));
+                        }
                     }
                 }
             }
@@ -323,6 +343,6 @@ public class QunduActivity extends BaseActivity {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_get_data;
+        return R.layout.activity_qun;
     }
 }

@@ -1,6 +1,7 @@
 package com.uhf.uhf.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -11,7 +12,9 @@ import android.widget.Toast;
 import com.example.administrator.baselib.base.BaseActivity;
 import com.example.administrator.baselib.interfaces.BaseDialogInterface;
 import com.example.administrator.baselib.util.JsonParserUtil;
+import com.example.administrator.baselib.util.TopTitleUtils;
 import com.example.administrator.baselib.view.dialog.CommenDialog;
+import com.reader.code.OpenTTFUtils;
 import com.tamic.novate.Throwable;
 import com.uhf.uhf.R;
 import com.uhf.uhf.base.BaseRecycleAdapter;
@@ -64,6 +67,7 @@ public class GetPlanActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        new TopTitleUtils(this).setTitle("获取计划").setLeft(null);;
         mLoaddingUtils = new LoaddingUtils(mActivity);
     }
 
@@ -106,7 +110,7 @@ public class GetPlanActivity extends BaseActivity {
 
     }
 
-    @OnClick({R.id.tvGetData, R.id.centerContent, R.id.tvDownLoad})
+    @OnClick({R.id.tvGetData, R.id.centerContent, R.id.tvDownLoad, R.id.tvCancel})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.tvDownLoad:
@@ -122,10 +126,9 @@ public class GetPlanActivity extends BaseActivity {
                     public void onSuccess(GetAssetCheckDetailsBean data) {
                         if (data != null) {
                             data.id = result.get(mPosition).id;
-
                             String string = JsonParserUtil.serializeToJson(data);
                             SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, string);
-                            mCommenDialog.setContent(result.get(mPosition).deadDate+" 的盘点任务已下载");
+                            mCommenDialog.setContent(DateUtil.DateTZ2Normal(result.get(mPosition).deadDate) + " 的盘点任务已下载");
                             mCommenDialog.show();
 
                         }
@@ -142,40 +145,53 @@ public class GetPlanActivity extends BaseActivity {
                 if (mRecyclerView.getVisibility() == View.GONE) {
                     mRecyclerView.setVisibility(View.VISIBLE);
                     arrow.setBackgroundResource(R.drawable.arrow_up);
+                    if (result.size() == 0) {
+                        getPlanData();
+                    }
+
                 } else {
                     mRecyclerView.setVisibility(View.GONE);
                     arrow.setBackgroundResource(R.drawable.arrow_down);
                 }
                 break;
             case R.id.tvGetData:
-                mLoaddingUtils.show();
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("deadDate", "");
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                getPlanData();
+                break;
+            case R.id.tvCancel:
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    startActivity(new Intent(this, QunduActivity.class));
                 }
-                HttpUtils.doPost(HttpUrl.FilterUnfinishedAssetChecks, jsonObject, new CallBack<FilterUnfinishedAssetChecksBean>() {
-                    @Override
-                    public void onSuccess(FilterUnfinishedAssetChecksBean data) {
-                        mRecyclerView.setVisibility(View.VISIBLE);
-                        arrow.setBackgroundResource(R.drawable.arrow_up);
-                        mLoaddingUtils.dismiss();
-                        result.clear();
-                        if (data != null && data.result != null && data.result.size() > 0) {
-                            result.addAll(data.result);
-                            mMyAdapter.notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    public void onFailed(Throwable e) {
-                        mLoaddingUtils.dismiss();
-                    }
-
-                });
                 break;
         }
+    }
+
+    private void getPlanData() {
+        mLoaddingUtils.show();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("deadDate", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HttpUtils.doPost(HttpUrl.FilterUnfinishedAssetChecks, jsonObject, new CallBack<FilterUnfinishedAssetChecksBean>() {
+            @Override
+            public void onSuccess(FilterUnfinishedAssetChecksBean data) {
+                mRecyclerView.setVisibility(View.VISIBLE);
+                arrow.setBackgroundResource(R.drawable.arrow_up);
+                mLoaddingUtils.dismiss();
+                result.clear();
+                if (data != null && data.result != null && data.result.size() > 0) {
+                    result.addAll(data.result);
+                    mMyAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailed(Throwable e) {
+                mLoaddingUtils.dismiss();
+            }
+
+        });
     }
 
     class MyAdapter extends BaseRecycleAdapter<FilterUnfinishedAssetChecksBean.ResultBean> {
@@ -187,6 +203,7 @@ public class GetPlanActivity extends BaseActivity {
         @Override
         public void bindData(BaseViewHolder holder, FilterUnfinishedAssetChecksBean.ResultBean data, int position) {
             holder.setText(R.id.tv, data.name);
+            holder.setText(R.id.tvTime, DateUtil.DateTZ2Normal(data.deadDate));
         }
 
         @Override

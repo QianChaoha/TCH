@@ -1,5 +1,7 @@
 package com.uhf.uhf.util;
 
+import android.text.TextUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,14 +28,11 @@ public class DateUtil {
      * @return
      */
     public static String DateTZ2Normal(String datetime) {
-        try {
-            SimpleDateFormat formatTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            formatTZ.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date TZDate = formatTZ.parse(datetime);
-            return format.format(TZDate);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!TextUtils.isEmpty(datetime)) {
+            int index = datetime.indexOf("T");
+            if (index != -1) {
+                return datetime.substring(0, index);
+            }
         }
         return "";
     }
@@ -57,6 +56,7 @@ public class DateUtil {
         Date date = c.getTime();
         return sdf.format(date);
     }
+
     // 毫秒转日期
     public static String millionSecondToDateNoYear(long time) {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");

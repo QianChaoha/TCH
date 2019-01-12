@@ -48,7 +48,7 @@ import static com.uhf.uhf.UHFApplication.mUserBean;
  */
 public class HomeActivity extends BaseActivity {
     LoaddingUtils mLoaddingUtils;
-
+    public static int CLEAN_DATA_TIME = 400;
 
     @Override
     protected int getLayoutId() {
@@ -106,8 +106,7 @@ public class HomeActivity extends BaseActivity {
                 }
                 break;
             case R.id.btSetting:
-                //SettingActivity.startSettingActivity(this);
-                //startActivity(new Intent(mActivity, ConnectRs232.class));
+                SettingActivity.startSettingActivity(this);
                 break;
             case R.id.btTagRw:
                 OpenScanUtils.openScan(mActivity);

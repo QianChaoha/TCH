@@ -11,7 +11,7 @@ import java.util.List;
 public class UploadPanDataBean {
 
     public int id;
-    public List<AssetDetailsBean> assetCheckDetail;
+    public List<AssetDetailsBean> assetCheckDetails;
 
     public static class AssetDetailsBean {
         public AssetDetailsBean(String assetCode) {

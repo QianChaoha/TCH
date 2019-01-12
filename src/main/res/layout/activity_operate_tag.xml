@@ -1,503 +1,514 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/gradient_bg"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.uhf.uhf.LogList
-        android:id="@+id/log_list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+    <include layout="@layout/title_layout" />
 
-    <com.uhf.uhf.TagRealList
-        android:id="@+id/tag_access_list"
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:layout_height="fill_parent"
+        android:background="@drawable/gradient_bg"
+        android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/tag_access_list"
-        android:layout_alignParentTop="true"
-        android:background="#EEEEEE"
-        android:fadingEdge="vertical"
-        android:fillViewport="true"
-        android:scrollbars="vertical">
-
-        <LinearLayout
+        <com.uhf.uhf.LogList
+            android:id="@+id/log_list"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:orientation="vertical">
+            android:layout_alignParentBottom="true" />
 
+        <com.uhf.uhf.TagRealList
+            android:id="@+id/tag_access_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3.7dip"
-                android:layout_marginTop="5dip"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dip"
-                android:text="@string/tag_write_read"
-                android:textColor="#ff222222"
-                android:textSize="9.5sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:paddingTop="10dp"
-                android:background="@drawable/line"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RadioGroup
-                        android:id="@+id/group_access_area_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <RadioButton
-                            android:id="@+id/set_access_area_epc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:button="@drawable/radio_button_selector"
-                            android:checked="true"
-                            android:paddingBottom="3.7sp"
-                            android:paddingTop="3.7sp"
-                            android:text="@string/area_epc"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-
-                        <RadioButton
-                            android:id="@+id/set_access_area_tid"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:button="@drawable/radio_button_selector"
-                            android:paddingBottom="3.7sp"
-                            android:paddingTop="3.7sp"
-                            android:text="@string/area_tid"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-
-                        <RadioButton
-                            android:id="@+id/set_access_area_user"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:button="@drawable/radio_button_selector"
-                            android:paddingBottom="3.7sp"
-                            android:paddingTop="3.7sp"
-                            android:text="@string/area_user"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-                    </RadioGroup>
-
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="3.7sp"
-                        android:layout_marginLeft="7.5sp"
-                        android:layout_marginRight="7.5sp"
-                        android:layout_marginTop="3.7sp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="3.7sp"
-                            android:layout_marginLeft="3.7sp"
-                            android:layout_marginRight="3.7sp"
-                            android:layout_marginTop="3.7sp"
-                            android:clickable="true"
-                            android:text="@string/password"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-
-                        <com.uhf.uhf.HexEditTextBox
-                            android:id="@+id/password_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="22.5sp"
-                            android:background="@drawable/editbox_background"
-                            android:digits="0123456789abcdefABCDEF"
-                            android:gravity="center_vertical|center_horizontal"
-                            android:inputType="number"
-                            android:singleLine="true"
-                            android:text="00000000"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="3.7sp"
-                        android:layout_marginLeft="7.5sp"
-                        android:layout_marginRight="7.5sp"
-                        android:layout_marginTop="3.7sp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="3.7sp"
-                            android:layout_marginLeft="3.7sp"
-                            android:layout_marginRight="3.7sp"
-                            android:layout_marginTop="3.7sp"
-                            android:clickable="true"
-                            android:text="@string/start_add"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-
-                        <EditText
-                            android:id="@+id/start_addr_text"
-                            android:layout_width="fill_parent"
-                            android:layout_height="22.5sp"
-                            android:background="@drawable/editbox_background"
-                            android:gravity="center_vertical|center_horizontal"
-                            android:inputType="number"
-                            android:singleLine="true"
-                            android:text="02"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="3.7sp"
-                        android:layout_marginLeft="7.5sp"
-                        android:layout_marginRight="7.5sp"
-                        android:layout_marginTop="3.7sp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="3.7sp"
-                            android:layout_marginLeft="3.7sp"
-                            android:layout_marginRight="3.7sp"
-                            android:layout_marginTop="3.7sp"
-                            android:clickable="true"
-                            android:text="@string/data_length"
-                            android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
-
-                        <EditText
-                            android:id="@+id/data_length_text"
-                            android:layout_width="fill_parent"
-                            android:layout_height="22.5sp"
-                            android:background="@drawable/editbox_background"
-                            android:gravity="center_vertical|center_horizontal"
-                            android:inputType="number"
-                            android:singleLine="true"
-                            android:text="04"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="3.7sp"
-                    android:layout_marginLeft="7.5sp"
-                    android:layout_marginRight="7.5sp"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_vertical">
-
-
-                    <TextView
-                        android:id="@+id/read"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/button_press_background"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="@string/read_tag"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold"
-                        />
-
-                    <TextView
-                        android:id="@+id/write"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:background="@drawable/button_press_background"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="@string/write_tag"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
-
-                    <com.uhf.uhf.HexEditTextBox
-                        android:id="@+id/data_write_text"
-                        android:layout_width="fill_parent"
-                        android:layout_toLeftOf="@+id/write"
-                        android:layout_toRightOf="@+id/read"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="7.5sp"
-                        android:paddingTop="7.5sp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_centerVertical="true"
-                        android:background="@drawable/editbox_background"
-                        android:digits="0123456789abcdefABCDEF"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:inputType="text"
-                        android:singleLine="true"
-                        android:textSize="9.5sp" />
-
-                </RelativeLayout>
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="3.7sp"
-                    android:layout_marginLeft="7.5sp"
-                    android:layout_marginRight="7.5sp"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_vertical">
-
-
-                    <TextView
-                        android:id="@+id/codeRead"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/button_disenabled_background"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="条码读取"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/codeWrite"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:background="@drawable/button_selector"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="@string/write_tag"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
-
-                    <com.uhf.uhf.HexEditTextBox
-                        android:id="@+id/codeText"
-                        android:layout_width="fill_parent"
-                        android:layout_toLeftOf="@+id/codeWrite"
-                        android:layout_toRightOf="@+id/codeRead"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="7.5sp"
-                        android:paddingTop="7.5sp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_centerVertical="true"
-                        android:background="@drawable/editbox_background"
-                        android:digits="0123456789abcdefABCDEF"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:inputType="text"
-                        android:singleLine="true"
-                        android:textSize="9.5sp" />
-
-                </RelativeLayout>
-
-
-            </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3.7dip"
-                android:layout_marginTop="5dip"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dip"
-                android:text="广播EPC"
-                android:textColor="#ff222222"
-                android:textSize="9.5sp" />
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tag_access_list"
+            android:layout_alignParentTop="true"
+            android:background="#EEEEEE"
+            android:fadingEdge="vertical"
+            android:fillViewport="true"
+            android:scrollbars="vertical">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:paddingTop="10dp"
-                android:background="@drawable/line"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:orientation="vertical">
 
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3.7sp"
-                    android:layout_marginLeft="7.5sp"
-                    android:layout_marginRight="7.5sp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="3.7dip"
+                    android:layout_marginTop="5dip"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:paddingLeft="10dip"
+                    android:text="@string/tag_write_read"
+                    android:textColor="#ff222222"
+                    android:textSize="9.5sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/line"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioGroup
+                            android:id="@+id/group_access_area_type"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/set_access_area_epc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:button="@drawable/radio_button_selector"
+                                android:checked="true"
+                                android:paddingBottom="3.7sp"
+                                android:paddingTop="3.7sp"
+                                android:text="@string/area_epc"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <RadioButton
+                                android:id="@+id/set_access_area_tid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:button="@drawable/radio_button_selector"
+                                android:paddingBottom="3.7sp"
+                                android:paddingTop="3.7sp"
+                                android:text="@string/area_tid"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <RadioButton
+                                android:id="@+id/set_access_area_user"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:button="@drawable/radio_button_selector"
+                                android:paddingBottom="3.7sp"
+                                android:paddingTop="3.7sp"
+                                android:text="@string/area_user"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+                        </RadioGroup>
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="3.7sp"
+                            android:layout_marginLeft="7.5sp"
+                            android:layout_marginRight="7.5sp"
+                            android:layout_marginTop="3.7sp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3.7sp"
+                                android:layout_marginLeft="3.7sp"
+                                android:layout_marginRight="3.7sp"
+                                android:layout_marginTop="3.7sp"
+                                android:clickable="true"
+                                android:text="@string/password"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <com.uhf.uhf.HexEditTextBox
+                                android:id="@+id/password_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="22.5sp"
+                                android:background="@drawable/editbox_background"
+                                android:digits="0123456789abcdefABCDEF"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:inputType="number"
+                                android:singleLine="true"
+                                android:text="00000000"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
 
 
-                    <TextView
-                        android:id="@+id/readBroad"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/button_press_background"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="@string/read_tag"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/codeReadBroad"
-                        android:layout_width="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="3.7sp"
+                            android:layout_marginLeft="7.5sp"
+                            android:layout_marginRight="7.5sp"
+                            android:layout_marginTop="3.7sp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3.7sp"
+                                android:layout_marginLeft="3.7sp"
+                                android:layout_marginRight="3.7sp"
+                                android:layout_marginTop="3.7sp"
+                                android:clickable="true"
+                                android:text="@string/start_add"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <EditText
+                                android:id="@+id/start_addr_text"
+                                android:layout_width="fill_parent"
+                                android:layout_height="22.5sp"
+                                android:background="@drawable/editbox_background"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:inputType="number"
+                                android:singleLine="true"
+                                android:text="02"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="3.7sp"
+                            android:layout_marginLeft="7.5sp"
+                            android:layout_marginRight="7.5sp"
+                            android:layout_marginTop="3.7sp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3.7sp"
+                                android:layout_marginLeft="3.7sp"
+                                android:layout_marginRight="3.7sp"
+                                android:layout_marginTop="3.7sp"
+                                android:clickable="true"
+                                android:text="@string/data_length"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <EditText
+                                android:id="@+id/data_length_text"
+                                android:layout_width="fill_parent"
+                                android:layout_height="22.5sp"
+                                android:background="@drawable/editbox_background"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:inputType="number"
+                                android:singleLine="true"
+                                android:text="04"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/button_disenabled_background"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:layout_marginLeft="15dp"
-                        android:text="条码读取"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="3.7sp"
+                        android:layout_marginLeft="7.5sp"
+                        android:layout_marginRight="7.5sp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_vertical">
+
+
+                        <TextView
+                            android:id="@+id/read"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/button_press_background"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="@string/read_tag"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/write"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/button_press_background"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="@string/write_tag"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <com.uhf.uhf.HexEditTextBox
+                            android:id="@+id/data_write_text"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_toLeftOf="@+id/write"
+                            android:layout_toRightOf="@+id/read"
+                            android:background="@drawable/editbox_background"
+                            android:digits="0123456789abcdefABCDEF"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:inputType="text"
+                            android:paddingBottom="7.5sp"
+                            android:paddingTop="7.5sp"
+                            android:singleLine="true"
+                            android:textSize="9.5sp" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="3.7sp"
+                        android:layout_marginLeft="7.5sp"
+                        android:layout_marginRight="7.5sp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_vertical">
+
+
+                        <TextView
+                            android:id="@+id/codeRead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/button_disenabled_background"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="条码读取"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/codeWrite"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/button_selector"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="@string/write_tag"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <com.uhf.uhf.HexEditTextBox
+                            android:id="@+id/codeText"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_toLeftOf="@+id/codeWrite"
+                            android:layout_toRightOf="@+id/codeRead"
+                            android:background="@drawable/editbox_background"
+                            android:digits="0123456789abcdefABCDEF"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:inputType="text"
+                            android:paddingBottom="7.5sp"
+                            android:paddingTop="7.5sp"
+                            android:singleLine="true"
+                            android:textSize="9.5sp" />
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3.7dip"
+                    android:layout_marginTop="5dip"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dip"
+                    android:text="广播EPC"
+                    android:textColor="#ff222222"
+                    android:textSize="9.5sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/line"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp">
+
+
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="3.7sp"
                         android:layout_marginLeft="7.5sp"
                         android:layout_marginRight="7.5sp"
-                        android:layout_marginTop="3.7sp"
+                        android:layout_marginTop="5dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
+
                         <TextView
+                            android:id="@+id/readBroad"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="3.7sp"
-                            android:layout_marginRight="3.7sp"
-                            android:paddingTop="7.5sp"
-                            android:paddingBottom="7.5sp"
+                            android:background="@drawable/button_press_background"
                             android:clickable="true"
-                            android:text="读取密码"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="@string/read_tag"
                             android:textColor="#ff222222"
-                            android:textSize="9.5sp" />
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
 
-                        <com.uhf.uhf.HexEditTextBox
-                            android:id="@+id/password_text_bottom"
-                            android:layout_width="match_parent"
-                            android:layout_height="22.5sp"
-                            android:background="@drawable/editbox_background"
-                            android:digits="0123456789abcdefABCDEF"
-                            android:gravity="center_vertical|center_horizontal"
-                            android:inputType="number"
-                            android:singleLine="true"
-                            android:text="00000000"
-                            android:textSize="12sp" />
+                        <TextView
+                            android:id="@+id/codeReadBroad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:background="@drawable/button_disenabled_background"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="条码读取"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="3.7sp"
+                            android:layout_marginLeft="7.5sp"
+                            android:layout_marginRight="7.5sp"
+                            android:layout_marginTop="3.7sp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="3.7sp"
+                                android:layout_marginRight="3.7sp"
+                                android:clickable="true"
+                                android:paddingBottom="7.5sp"
+                                android:paddingTop="7.5sp"
+                                android:text="读取密码"
+                                android:textColor="#ff222222"
+                                android:textSize="9.5sp" />
+
+                            <com.uhf.uhf.HexEditTextBox
+                                android:id="@+id/password_text_bottom"
+                                android:layout_width="match_parent"
+                                android:layout_height="22.5sp"
+                                android:background="@drawable/editbox_background"
+                                android:digits="0123456789abcdefABCDEF"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:inputType="number"
+                                android:singleLine="true"
+                                android:text="00000000"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                </LinearLayout>
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="3.7sp"
-                    android:layout_marginLeft="7.5sp"
-                    android:layout_marginRight="7.5sp"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_vertical">
-
-
-                    <TextView
-                        android:id="@+id/codeWriteBroad"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:background="@drawable/button_selector"
-                        android:clickable="true"
-                        android:gravity="center_horizontal"
-                        android:paddingBottom="7.5sp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="7.5sp"
-                        android:text="@string/write_tag"
-                        android:textColor="#ff222222"
-                        android:textSize="9.5sp"
-                        android:textStyle="bold" />
-
-                    <com.uhf.uhf.HexEditTextBox
-                        android:id="@+id/codeTextBroad"
+                    <RelativeLayout
                         android:layout_width="fill_parent"
-                        android:layout_toLeftOf="@+id/codeWriteBroad"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="7.5sp"
-                        android:paddingTop="7.5sp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_centerVertical="true"
-                        android:background="@drawable/editbox_background"
-                        android:digits="0123456789abcdefABCDEF"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:inputType="text"
-                        android:singleLine="true"
-                        android:textSize="9.5sp" />
-
-                </RelativeLayout>
+                        android:layout_marginBottom="3.7sp"
+                        android:layout_marginLeft="7.5sp"
+                        android:layout_marginRight="7.5sp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_vertical">
 
 
+                        <TextView
+                            android:id="@+id/codeWriteBroad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/button_selector"
+                            android:clickable="true"
+                            android:gravity="center_horizontal"
+                            android:paddingBottom="7.5sp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="7.5sp"
+                            android:text="@string/write_tag"
+                            android:textColor="#ff222222"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                        <com.uhf.uhf.HexEditTextBox
+                            android:id="@+id/codeTextBroad"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_toLeftOf="@+id/codeWriteBroad"
+                            android:background="@drawable/editbox_background"
+                            android:digits="0123456789abcdefABCDEF"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:inputType="text"
+                            android:paddingBottom="7.5sp"
+                            android:paddingTop="7.5sp"
+                            android:singleLine="true"
+                            android:textSize="9.5sp" />
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
-    </ScrollView>
-</RelativeLayout>
+        </ScrollView>
+    </RelativeLayout>
+</LinearLayout>
 
