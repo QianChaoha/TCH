@@ -92,9 +92,14 @@ public class HomeActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet, R.id.btQun})
+    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet, R.id.btQun, R.id.tvSearchTag})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.tvSearchTag:
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    startActivity(new Intent(this, SearchTagActivity.class));
+                }
+                break;
             case R.id.btQun:
                 if (OpenTTFUtils.openUHF(mActivity)) {
                     startActivity(new Intent(this, QunduActivity.class));

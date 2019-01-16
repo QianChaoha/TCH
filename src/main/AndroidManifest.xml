@@ -129,6 +129,7 @@
         <activity android:name=".activity.GetDataActivity" />
         <activity android:name=".activity.GetPlanActivity" />
         <activity android:name=".activity.QunduActivity" />
+        <activity android:name=".activity.SearchTagActivity" />
 
     </application>
 

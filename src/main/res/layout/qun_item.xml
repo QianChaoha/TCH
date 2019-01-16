@@ -26,7 +26,7 @@
             android:id="@+id/tvEpc"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="11"
+            android:layout_weight="13"
             android:paddingLeft="5dp"
             android:text="EPC" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/tvCount"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:paddingRight="5dp"
             android:gravity="right"
             android:text="次数" />
@@ -53,7 +53,7 @@
             android:id="@+id/tvRssi"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:gravity="right"
             android:paddingRight="5dp"
             android:text="RSSI" />
