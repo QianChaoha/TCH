@@ -39,29 +39,24 @@
             android:id="@+id/tvCount"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:paddingRight="5dp"    android:visibility="gone"
+            android:layout_weight="2"
+            android:paddingRight="5dp"
             android:gravity="right"
             android:text="次数" />
 
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/black" />
 
         <TextView
             android:id="@+id/tvRssi"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0"
+            android:layout_weight="3"
             android:gravity="right"
             android:paddingRight="5dp"
-            android:visibility="gone"
             android:text="RSSI" />
-        <TextView
-            android:id="@+id/tvLocation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:maxLines="2"
-            android:gravity="right"
-            android:paddingRight="5dp"/>
     </LinearLayout>
 
     <View

@@ -11,7 +11,7 @@
         android:background="@drawable/gradient_bg"
         android:orientation="vertical">
 
-        <com.uhf.uhf.LogList
+        <TextView
             android:id="@+id/log_list"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

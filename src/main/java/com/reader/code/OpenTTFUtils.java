@@ -51,8 +51,9 @@ public class OpenTTFUtils {
             return false;
         }
         if (!ModuleManager.newInstance().setUHFStatus(true)) {
-            throw new RuntimeException("UHF RFID power on failure,may you open in other" +
-                    " Process and do not exit it");
+            Toast.makeText(context,"UHF RFID power on failure,may you open in other" +
+                    " Process and do not exit it",Toast.LENGTH_SHORT).show();
+            return false;
         }
         return true;
     }

@@ -27,6 +27,7 @@ import com.reader.helper.ReaderSetting;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagRealList;
 import com.uhf.uhf.adapter.GetPanAdapter;
+import com.uhf.uhf.adapter.QunAdapter;
 import com.uhf.uhf.bean.AssertItemBean;
 import com.uhf.uhf.bean.GetAssetCheckDetailsBean;
 import com.uhf.uhf.bean.UploadPanDataBean;
@@ -56,7 +57,7 @@ public class QunduActivity extends BaseActivity {
     @Bind(R.id.tvLogDetail)
     TextView mTvLogDetail;
     List<AssertItemBean> mDatas = new ArrayList<AssertItemBean>();
-    private GetPanAdapter mGetPanAdapter;
+    private QunAdapter mGetPanAdapter;
     private ReaderHelper mReaderHelper;
     private LocalBroadcastManager lbm;
     private Handler mUpdateViewHandler = new Handler() {
@@ -101,7 +102,7 @@ public class QunduActivity extends BaseActivity {
     @Override
     protected void initView() {
         new TopTitleUtils(this).setTitle("群读").setLeft(null);;
-        mGetPanAdapter = new GetPanAdapter(mActivity, mDatas);
+        mGetPanAdapter = new QunAdapter(mActivity, mDatas);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mGetPanAdapter);
         try {
@@ -192,7 +193,7 @@ public class QunduActivity extends BaseActivity {
 
         {
             if (!mStartStop.getText().toString()
-                    .equals("盘点")) {
+                    .equals("群读")) {
                 mReaderHelper.setInventoryFlag(false);
                 m_curInventoryBuffer.bLoopInventoryReal = false;
 
@@ -230,11 +231,11 @@ public class QunduActivity extends BaseActivity {
     private void refreshStartStop(boolean start) {
         mStart = start;
         if (start) {
-            mStartStop.setText("停止盘点");
-            mTvLogDetail.setText("盘点中...");
+            mStartStop.setText("停止群读");
+            mTvLogDetail.setText("群读中...");
         } else {
-            mStartStop.setText("盘点");
-            mTvLogDetail.setText("盘点中结束");
+            mStartStop.setText("群读");
+            mTvLogDetail.setText("群读结束");
         }
     }
 

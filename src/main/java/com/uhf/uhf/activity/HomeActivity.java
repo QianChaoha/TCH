@@ -106,7 +106,9 @@ public class HomeActivity extends BaseActivity {
                 }
                 break;
             case R.id.btSetting:
-                SettingActivity.startSettingActivity(this);
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    SettingActivity.startSettingActivity(this);
+                }
                 break;
             case R.id.btTagRw:
                 OpenScanUtils.openScan(mActivity);

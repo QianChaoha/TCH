@@ -102,36 +102,6 @@
             android:windowSoftInputMode="adjustPan"></activity>
 
         <activity
-            android:name="com.uhf.uhf.tagpage.PageInventoryReal"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
-            android:name="com.uhf.uhf.tagpage.PageInventoryBuffer"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
-            android:name="com.uhf.uhf.tagpage.PageInventoryFast"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
-            android:name="com.uhf.uhf.tagpage.PageInventoryReal6B"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
-            android:name="com.uhf.uhf.tagpage.PageTagAccess"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
-            android:name="com.uhf.uhf.tagpage.PageTag6BAccess"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="adjustPan"></activity>
-
-        <activity
             android:name="com.uhf.uhf.MainActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan"></activity>

@@ -144,7 +144,7 @@
                     android:layout_weight="2"
                     android:background="@color/green"
                     android:paddingLeft="5dp"
-                    android:text="No." />
+                    android:text="ID" />
 
                 <View
                     android:layout_width="1dp"
@@ -154,10 +154,10 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="8"
+                    android:layout_weight="11"
                     android:background="#C6E0B4"
                     android:paddingLeft="5dp"
-                    android:text="EPC" />
+                    android:text="资产名称" />
 
                 <View
                     android:layout_width="1dp"
@@ -167,25 +167,33 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
+                    android:layout_weight="0"
                     android:background="#C6E0B4"
                     android:gravity="right"
                     android:paddingRight="5dp"
-                    android:text="次数" />
+                    android:text="次数"
+                    android:visibility="gone" />
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/black" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
+                    android:layout_weight="0"
                     android:background="#C6E0B4"
                     android:gravity="right"
                     android:paddingRight="5dp"
-                    android:text="RSSI" />
+                    android:text="RSSI"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:gravity="right"
+                    android:paddingRight="5dp"
+                    android:background="#C6E0B4"
+                    android:text="位置" />
             </LinearLayout>
 
             <View

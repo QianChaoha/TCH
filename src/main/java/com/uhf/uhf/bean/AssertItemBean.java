@@ -18,6 +18,7 @@ public class AssertItemBean {
 
     public int id;
     public int assetId;
+    public String mAssetLocationName;
 
     public AssertItemBean(String epcData, String count, String rssi, int state, int id, int assetId) {
         this.epcData = epcData;
@@ -26,5 +27,15 @@ public class AssertItemBean {
         this.state = state;
         this.id = id;
         this.assetId = assetId;
+    }
+
+    public AssertItemBean(String epcData, String count, String rssi, int state, int id, int assetId, String assetLocationName) {
+        this.epcData = epcData;
+        this.count = count;
+        this.rssi = rssi;
+        this.state = state;
+        this.id = id;
+        this.assetId = assetId;
+        mAssetLocationName = assetLocationName;
     }
 }

@@ -4,9 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +40,10 @@ import com.uhf.uhf.HexEditTextBox;
 import com.uhf.uhf.LogList;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagRealList;
+import com.uhf.uhf.util.FourUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -46,10 +54,6 @@ import com.uhf.uhf.TagRealList;
  */
 public class OperateTagActivity extends BaseActivity {
     private static final int REQUEST_CODE_SCAN = 100;
-    //fixed by lei.li 2016/11/09
-    //private LogList mLogList;
-    private LogList mLogList;
-    //fixed by lei.li 2016/11/09
 
     private TextView mRead, mWrite;
 
@@ -83,7 +87,7 @@ public class OperateTagActivity extends BaseActivity {
 
 
     private LocalBroadcastManager lbm;
-
+    TextView mLogList;
     private Context mContext;
     private boolean bTmpInventoryFlag = true;
     private String mStrRepeat = "1";
@@ -106,9 +110,9 @@ public class OperateTagActivity extends BaseActivity {
                 startstop(false);
                 selectTag(mPos);
                 if (mNotBrocestEpc) {
-                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
+                    operateData(mStartAddrEditText.getText().toString(), mDataLenEditText.getText().toString(), mPasswordEditText.getText().toString().toUpperCase(), 1, "");
                 } else {
-                    operateData(mPasswordBottom.getText().toString().toUpperCase(), 1, "");
+                    operateData(mStartAddrEditText.getText().toString(), mDataLenEditText.getText().toString(), mPasswordBottom.getText().toString().toUpperCase(), 1, "");
                 }
             }
         }
@@ -121,6 +125,7 @@ public class OperateTagActivity extends BaseActivity {
 
         }
     };
+
     public static void startOperateTagActivity(Context context) {
         Intent intent = new Intent(context, OperateTagActivity.class);
         context.startActivity(intent);
@@ -144,13 +149,12 @@ public class OperateTagActivity extends BaseActivity {
     @Override
     protected void initView() {
         mContext = this;
-        new TopTitleUtils(this).setTitle("标签读写").setLeft(null);;
+        new TopTitleUtils(this).setTitle("标签读写").setLeft(null);
         try {
             mReaderHelper = ReaderHelper.getDefaultHelper();
             mCodeReaderHelper = CodeReaderHelper.getDefaultHelper();
             mReader = mReaderHelper.getReader();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         m_curOperateBinDCodeTagbuffer = mCodeReaderHelper.getCurOperateTagBinDCodeBuffer();
@@ -163,7 +167,6 @@ public class OperateTagActivity extends BaseActivity {
 
         mPasswordBottom = findViewById(R.id.password_text_bottom);
         mCodeTextBroad = findViewById(R.id.codeTextBroad);
-        mLogList = (LogList) findViewById(R.id.log_list);
         mRead = (TextView) findViewById(R.id.read);
         mWrite = (TextView) findViewById(R.id.write);
         mRead.setOnClickListener(setAccessOnClickListener);
@@ -174,6 +177,7 @@ public class OperateTagActivity extends BaseActivity {
         findViewById(R.id.readBroad).setOnClickListener(setAccessOnClickListener);
         findViewById(R.id.codeReadBroad).setOnClickListener(setAccessOnClickListener);
 
+        mLogList = findViewById(R.id.log_list);
         mPasswordEditText = (HexEditTextBox) findViewById(R.id.password_text);
         mStartAddrEditText = (EditText) findViewById(R.id.start_addr_text);
         mDataLenEditText = (EditText) findViewById(R.id.data_length_text);
@@ -274,10 +278,7 @@ public class OperateTagActivity extends BaseActivity {
             refreshStartStop(true);
         }
 
-        // start_fixed by lei.li 2016/11/04 problem
-        // m_curInventoryBuffer.clearInventoryRealResult();
         mReaderHelper.setInventoryFlag(true);
-        // end_fixed by lei.li 2016/11/04
 
         mReaderHelper.clearInventoryTotal();
         refreshText();
@@ -286,7 +287,6 @@ public class OperateTagActivity extends BaseActivity {
                 .get(m_curInventoryBuffer.nIndexAntenna);
         if (btWorkAntenna < 0)
             btWorkAntenna = 0;
-        // mReader.setWorkAntenna(m_curReaderSetting.btReadId, btWorkAntenna);
         mReaderHelper.runLoopInventroy();
         m_curReaderSetting.btWorkAntenna = btWorkAntenna;
         refreshStartStop(true);
@@ -325,15 +325,22 @@ public class OperateTagActivity extends BaseActivity {
                     setBtState(R.id.codeRead, R.id.read);
                     break;
                 case R.id.write: {
-                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 2, mDataEditText.getText().toString().toUpperCase());
+                    operateData(mStartAddrEditText.getText().toString(), mDataLenEditText.getText().toString(), mPasswordEditText.getText().toString().toUpperCase(), 2, mDataEditText.getText().toString().toUpperCase());
                     break;
                 }
                 case R.id.codeWrite:
-                    operateData(mPasswordEditText.getText().toString().toUpperCase(), 2, mCodeText.getText().toString().toUpperCase());
+                    operateData(mStartAddrEditText.getText().toString(), mDataLenEditText.getText().toString(), mPasswordEditText.getText().toString().toUpperCase(), 2, mCodeText.getText().toString().toUpperCase());
                     break;
                 case R.id.codeWriteBroad:
-
-                    //循环写入
+                    String text = mCodeTextBroad.getText().toString().replace(" ", "");
+                    int length = text.length();
+                    if (FourUtils.jgdgeFour(mCodeTextBroad)) {
+                        String pc = FourUtils.getPc(mCodeTextBroad);
+                        if (!"-1".equals(pc)) {
+                            operateData("01", length / 4 + "", mPasswordBottom.getText().toString().toUpperCase(),
+                                    2, pc + mCodeTextBroad.getText().toString().toUpperCase().replaceAll(" ", ""));
+                        }
+                    }
                     break;
                 case R.id.readBroad:
                     mNotBrocestEpc = false;
@@ -386,11 +393,13 @@ public class OperateTagActivity extends BaseActivity {
     }
 
     /**
-     * @param password  密码
-     * @param type      1 读取  2写入
-     * @param writeData 写入的数据
+     * @param startLength 起始长度
+     * @param dataLength  数据长度
+     * @param password    密码
+     * @param type        1 读取  2写入
+     * @param writeData   写入的数据
      */
-    private void operateData(String password, int type, String writeData) {
+    private void operateData(String startLength, String dataLength, String password, int type, String writeData) {
         byte btMemBank = 0x00;
         byte btWordAdd = 0x00;
         byte btWordCnt = 0x00;
@@ -407,7 +416,7 @@ public class OperateTagActivity extends BaseActivity {
         }
 
         try {
-            btWordAdd = (byte) Integer.parseInt(mStartAddrEditText.getText().toString());
+            btWordAdd = (byte) Integer.parseInt(startLength);
         } catch (Exception e) {
             Toast.makeText(
                     mContext,
@@ -429,7 +438,7 @@ public class OperateTagActivity extends BaseActivity {
 
         if (type == 1) {
             try {
-                btWordCnt = (byte) (Integer.parseInt(mDataLenEditText.getText().toString()));
+                btWordCnt = (byte) (Integer.parseInt(dataLength));
             } catch (Exception e) {
                 Toast.makeText(
                         mContext,
@@ -535,7 +544,7 @@ public class OperateTagActivity extends BaseActivity {
                         break;
                 }
             } else if (intent.getAction().equals(ReaderHelper.BROADCAST_WRITE_LOG)) {
-                mLogList.writeLog((String) intent.getStringExtra("log"), intent.getIntExtra("type", ERROR.SUCCESS));
+                setLog(intent);
             } else if (intent.getAction().equals(
                     ReaderHelper.BROADCAST_REFRESH_INVENTORY_REAL)) {
                 byte btCmd = intent.getByteExtra("cmd", (byte) 0x00);
@@ -573,10 +582,6 @@ public class OperateTagActivity extends BaseActivity {
                 }
 
             } else if (intent.getAction().equals(
-                    ReaderHelper.BROADCAST_WRITE_LOG)) {
-                mLogList.writeLog((String) intent.getStringExtra("log"),
-                        intent.getIntExtra("type", ERROR.SUCCESS));
-            } else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
                 if (m_curOperateBinDCodeTagbuffer.getIsTagList() != null && m_curOperateBinDCodeTagbuffer.getIsTagList().size() > 0) {
                     mCodeText.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
@@ -585,20 +590,18 @@ public class OperateTagActivity extends BaseActivity {
         }
     };
 
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mLogList.tryClose()) return true;
+    private void setLog(Intent intent) {
+        String log = (String) intent.getStringExtra("log");
+        int type = intent.getIntExtra("type", ERROR.SUCCESS);
+        Date now = new Date();
+        SimpleDateFormat temp = new SimpleDateFormat("kk:mm:ss");
+        mLogList.setText(temp.format(now) + ": " + log);
+        mLogList.setTextColor(type == ERROR.SUCCESS ? Color.BLACK : Color.RED);
+        if (type == ERROR.SUCCESS && "写标签".equals(log)) {
+            Toast.makeText(mContext, "写入成功", Toast.LENGTH_SHORT).show();
         }
-
-        return super.onKeyDown(keyCode, event);
     }
 
-    public void doDestroy() {
-        // TODO Auto-generated method stub
-        if (lbm != null)
-            lbm.unregisterReceiver(mRecv);
-    }
 
     public boolean mInterceptTouchEvent = false;
 

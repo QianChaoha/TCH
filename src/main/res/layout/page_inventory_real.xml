@@ -2,55 +2,8 @@
     android:layout_width="match_parent"
   	android:layout_height="match_parent"
   	android:orientation="vertical">
-  	<LinearLayout
-	            android:layout_width="fill_parent"
-				android:layout_height="50dp"
-				android:orientation="horizontal"
-				android:layout_marginTop="13.7sp"
-				android:layout_marginBottom="3.7sp"
-				android:background="@color/transparent_background">  
-				<!-- add by lei.li 2016/11/24 -->
-				<View
-					android:layout_width="7.5sp"
-					android:layout_height="match_parent"
-					android:background="#0bbbf7"/>
-				<!-- add by lei.li 2016/11/24 -->
-				<TextView
-				    android:id="@+id/startstop"
-					android:layout_width="fill_parent"
-	            	android:layout_height="match_parent"
-	            	android:layout_weight="1.0"
-					android:paddingTop="7.5sp"
-					android:paddingBottom="7.5sp"
-					android:layout_marginLeft="37.0sp"
-					android:layout_marginRight="37.0sp"
-					android:layout_marginBottom="7.5sp"
-					android:layout_marginTop="7.5sp"
-					android:gravity="center_horizontal|center_vertical"
-					android:layout_gravity="center_horizontal|center_vertical"
-					android:background="@drawable/button_background"
-					android:text="@string/start_inventory"
-					android:textColor="#ff222222"
-					android:textStyle="bold"
-					android:textSize="12.0sp"
-					android:clickable="true" />				
-				<CheckBox  
-				    android:id="@+id/check_real_set"
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:layout_gravity="center_horizontal|center_vertical"
-				    android:textColor="#ff222222"
-		           	android:textSize="12.0sp"
-		           	android:checked="false"
-				    android:text="@string/real_set" />
-				<!-- add by lei.li 2016/11/24 -->
-				<View
-					android:layout_width="7.5sp"
-					android:layout_height="match_parent"
-					android:background="#0bbbf7"/>
-				<!-- add by lei.li 2016/11/24 -->			
-			</LinearLayout>
-<LinearLayout 
+
+	<LinearLayout
     android:layout_width="match_parent"
   	android:layout_height="fill_parent">
 <RelativeLayout 
@@ -550,4 +503,54 @@
 		android:textColor="#0BBBF7"
 		android:textSize="20.0sp"
 		android:textStyle="bold" />
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="50dp"
+		android:layout_marginBottom="3.7sp"
+		android:layout_marginTop="13.7sp"
+		android:background="@color/transparent_background"
+		android:orientation="horizontal">
+		<!-- add by lei.li 2016/11/24 -->
+		<View
+			android:layout_width="7.5sp"
+			android:layout_height="match_parent"
+			android:background="#0bbbf7" />
+		<!-- add by lei.li 2016/11/24 -->
+		<TextView
+			android:id="@+id/startstop"
+			android:layout_width="fill_parent"
+			android:layout_height="match_parent"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:layout_marginBottom="7.5sp"
+			android:layout_marginLeft="37.0sp"
+			android:layout_marginRight="37.0sp"
+			android:layout_marginTop="7.5sp"
+			android:layout_weight="1.0"
+			android:background="@drawable/button_background"
+			android:clickable="true"
+			android:gravity="center_horizontal|center_vertical"
+			android:paddingBottom="7.5sp"
+			android:paddingTop="7.5sp"
+			android:text="@string/start_inventory"
+			android:textColor="#ff222222"
+			android:textSize="12.0sp"
+			android:textStyle="bold" />
+
+		<CheckBox
+			android:id="@+id/check_real_set"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:checked="false"
+			android:text="@string/real_set"
+			android:textColor="#ff222222"
+			android:textSize="12.0sp" />
+		<!-- add by lei.li 2016/11/24 -->
+		<View
+			android:layout_width="7.5sp"
+			android:layout_height="match_parent"
+			android:background="#0bbbf7" />
+		<!-- add by lei.li 2016/11/24 -->
+	</LinearLayout>
 </LinearLayout>

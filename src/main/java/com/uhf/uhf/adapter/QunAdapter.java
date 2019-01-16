@@ -16,8 +16,8 @@ import java.util.List;
  *
  * @author: cqian
  */
-public class GetPanAdapter extends BaseRecycleAdapter<AssertItemBean> {
-    public GetPanAdapter(Context context, List<AssertItemBean> dataList) {
+public class QunAdapter extends BaseRecycleAdapter<AssertItemBean> {
+    public QunAdapter(Context context, List<AssertItemBean> dataList) {
         super(context, dataList);
     }
 
@@ -32,12 +32,11 @@ public class GetPanAdapter extends BaseRecycleAdapter<AssertItemBean> {
         holder.setText(R.id.tvNo, (position + 1) + "", color)
                 .setText(R.id.tvEpc, data.epcData, color)
                 .setText(R.id.tvCount, data.count, color)
-                .setText(R.id.tvRssi, data.rssi, color)
-                .setText(R.id.tvLocation, data.mAssetLocationName, color);
+                .setText(R.id.tvRssi, data.rssi, color);
     }
 
     @Override
     public int getLayoutId(int viewType) {
-        return R.layout.get_plan_item;
+        return R.layout.qun_item;
     }
 }

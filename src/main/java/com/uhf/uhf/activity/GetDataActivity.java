@@ -252,7 +252,7 @@ public class GetDataActivity extends BaseActivity {
 
             for (int i = 0; i < mCheckDetailsBean.result.size() && mCheckDetailsBean.result.get(i) != null; i++) {
                 mDatas.add(new AssertItemBean(mCheckDetailsBean.result.get(i).assetCode, "", "", mCheckDetailsBean.result.get(i).state,
-                        mCheckDetailsBean.id, mCheckDetailsBean.result.get(i).assetId));
+                        mCheckDetailsBean.id, mCheckDetailsBean.result.get(i).assetId,mCheckDetailsBean.result.get(i).assetLocationName));
             }
         }
         mGetPanAdapter.notifyDataSetChanged();
@@ -262,20 +262,24 @@ public class GetDataActivity extends BaseActivity {
     public void click(View view) {
         switch (view.getId()) {
             case R.id.tvSave:
+                if (mDatas.size() == 0) {
+                    Toast.makeText(mActivity, "没有数据需要保存", Toast.LENGTH_SHORT).show();
+                }else {
+                    GetAssetCheckDetailsBean detailsBean = new GetAssetCheckDetailsBean();
+                    detailsBean.result = new ArrayList<>();
+                    if (mCheckDetailsBean != null) {
+                        detailsBean.id = mCheckDetailsBean.id;
+                    }
+                    for (int i = 0; i < mDatas.size() && mDatas.get(i) != null; i++) {
+                        AssertItemBean assertItemBean = mDatas.get(i);
+                        detailsBean.result.add(new GetAssetCheckDetailsBean.ResultBean(assertItemBean.epcData, assertItemBean.count, assertItemBean.rssi, assertItemBean.state, assertItemBean.assetId));
+                    }
+                    mCheckDetailsBean = detailsBean;
+                    String string = JsonParserUtil.serializeToJson(detailsBean);
+                    SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, string);
+                    Toast.makeText(mActivity, "保存成功", Toast.LENGTH_SHORT).show();
+                }
 
-                GetAssetCheckDetailsBean detailsBean = new GetAssetCheckDetailsBean();
-                detailsBean.result = new ArrayList<>();
-                if (mCheckDetailsBean != null) {
-                    detailsBean.id = mCheckDetailsBean.id;
-                }
-                for (int i = 0; i < mDatas.size() && mDatas.get(i) != null; i++) {
-                    AssertItemBean assertItemBean = mDatas.get(i);
-                    detailsBean.result.add(new GetAssetCheckDetailsBean.ResultBean(assertItemBean.epcData, assertItemBean.count, assertItemBean.rssi, assertItemBean.state, assertItemBean.assetId));
-                }
-                mCheckDetailsBean = detailsBean;
-                String string = JsonParserUtil.serializeToJson(detailsBean);
-                SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, string);
-                Toast.makeText(mActivity, "保存成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btClean:
                 cleanData();
@@ -338,7 +342,7 @@ public class GetDataActivity extends BaseActivity {
                     getData();
                 }
             }, CLEAN_DATA_TIME);
-        }else {
+        } else {
             SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, "");
             getData();
         }
@@ -449,7 +453,7 @@ public class GetDataActivity extends BaseActivity {
             mTvLogDetail.setText("盘点中...");
         } else {
             mStartStop.setText("盘点");
-            mTvLogDetail.setText("盘点中结束");
+            mTvLogDetail.setText("盘点结束");
         }
     }
 

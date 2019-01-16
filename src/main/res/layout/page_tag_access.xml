@@ -198,18 +198,6 @@
                     android:checked="true"/>
 
                 <RadioButton
-                    android:id="@+id/set_access_area_tid"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:button="@drawable/radio_button_selector"
-                    android:paddingTop="3.7sp"
-                    android:paddingBottom="3.7sp"
-                    android:text="@string/area_tid"
-                    android:textColor="#ff222222"
-                    android:textSize="9.5sp" />
-
-                <RadioButton
                     android:id="@+id/set_access_area_user"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -497,6 +485,18 @@
                     android:paddingTop="3.7sp"
                     android:paddingBottom="3.7sp"
                     android:text="@string/area_user"
+                    android:textColor="#ff222222"
+                    android:textSize="9.5sp" />
+
+                <RadioButton
+                    android:id="@+id/set_access_area_tid"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:button="@drawable/radio_button_selector"
+                    android:paddingBottom="3.7sp"
+                    android:paddingTop="3.7sp"
+                    android:text="@string/area_tid"
                     android:textColor="#ff222222"
                     android:textSize="9.5sp" />
             </RadioGroup>
