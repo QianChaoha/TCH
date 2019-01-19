@@ -67,7 +67,7 @@ public class GetPlanActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        new TopTitleUtils(this).setTitle("获取计划").setLeft(null);;
+        new TopTitleUtils(this).setTitle("获取计划").setLeft(null);
         mLoaddingUtils = new LoaddingUtils(mActivity);
     }
 
@@ -130,7 +130,6 @@ public class GetPlanActivity extends BaseActivity {
                             SharedPreferencesUtils.putString(mActivity, GET_PAN_DATA, string);
                             mCommenDialog.setContent(DateUtil.DateTZ2Normal(result.get(mPosition).deadDate) + " 的盘点任务已下载");
                             mCommenDialog.show();
-
                         }
                         mLoaddingUtils.dismiss();
                     }

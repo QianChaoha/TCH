@@ -32,6 +32,7 @@ import com.tamic.novate.Throwable;
 import com.uhf.uhf.R;
 import com.uhf.uhf.TagRealList;
 import com.uhf.uhf.adapter.GetPanAdapter;
+import com.uhf.uhf.base.BaseViewHolder;
 import com.uhf.uhf.bean.AssertItemBean;
 import com.uhf.uhf.bean.GetAssetCheckDetailsBean;
 import com.uhf.uhf.bean.UploadJsPanDataBean;
@@ -194,6 +195,15 @@ public class GetDataActivity extends BaseActivity {
         mRecyclerView.setAdapter(mGetPanAdapter);
         mLoaddingUtils = new LoaddingUtils(mActivity);
 
+        mGetPanAdapter.setOnItemClickLitener(new BaseViewHolder.onItemCommonClickListener() {
+            @Override
+            public void onItemClickListener(View view, int position) {
+                Intent intent = new Intent(mActivity, AssertDetailActivity.class);
+                intent.putExtra("data",mDatas.get(position));
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void uploadJsData() {
@@ -251,8 +261,21 @@ public class GetDataActivity extends BaseActivity {
         if (mCheckDetailsBean != null && mCheckDetailsBean.result != null && mCheckDetailsBean.result.size() > 0) {
 
             for (int i = 0; i < mCheckDetailsBean.result.size() && mCheckDetailsBean.result.get(i) != null; i++) {
-                mDatas.add(new AssertItemBean(mCheckDetailsBean.result.get(i).assetCode, "", "", mCheckDetailsBean.result.get(i).state,
-                        mCheckDetailsBean.id, mCheckDetailsBean.result.get(i).assetId,mCheckDetailsBean.result.get(i).assetLocationName));
+                GetAssetCheckDetailsBean.ResultBean resultBean = mCheckDetailsBean.result.get(i);
+                AssertItemBean assertItemBean = new AssertItemBean(resultBean.assetCode, "", "", resultBean.state,
+                        mCheckDetailsBean.id, resultBean.assetId, resultBean.assetLocationName);
+                assertItemBean.assetName = resultBean.assetName;
+                assertItemBean.imgPath = resultBean.imgPath;
+                assertItemBean.note = resultBean.note;
+                assertItemBean.supplier = resultBean.supplier;
+                assertItemBean.price = resultBean.price;
+                assertItemBean.monopolized = resultBean.monopolized;
+                assertItemBean.assetLocationId = resultBean.assetLocationId;
+                assertItemBean.assetLocationName = resultBean.assetLocationName;
+                assertItemBean.inDate = resultBean.inDate;
+                assertItemBean.expireMonth = resultBean.expireMonth;
+
+                mDatas.add(assertItemBean);
             }
         }
         mGetPanAdapter.notifyDataSetChanged();
@@ -264,7 +287,7 @@ public class GetDataActivity extends BaseActivity {
             case R.id.tvSave:
                 if (mDatas.size() == 0) {
                     Toast.makeText(mActivity, "没有数据需要保存", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     GetAssetCheckDetailsBean detailsBean = new GetAssetCheckDetailsBean();
                     detailsBean.result = new ArrayList<>();
                     if (mCheckDetailsBean != null) {
@@ -272,7 +295,22 @@ public class GetDataActivity extends BaseActivity {
                     }
                     for (int i = 0; i < mDatas.size() && mDatas.get(i) != null; i++) {
                         AssertItemBean assertItemBean = mDatas.get(i);
-                        detailsBean.result.add(new GetAssetCheckDetailsBean.ResultBean(assertItemBean.epcData, assertItemBean.count, assertItemBean.rssi, assertItemBean.state, assertItemBean.assetId));
+
+                        GetAssetCheckDetailsBean.ResultBean resultBean = new GetAssetCheckDetailsBean.ResultBean(assertItemBean.epcData, assertItemBean.count, assertItemBean.rssi, assertItemBean.state, assertItemBean.assetId);
+
+
+                        resultBean.assetName = assertItemBean.assetName;
+                        resultBean.imgPath = assertItemBean.imgPath;
+                        resultBean.note = assertItemBean.note;
+                        resultBean.supplier = assertItemBean.supplier;
+                        resultBean.price = assertItemBean.price;
+                        resultBean.monopolized = assertItemBean.monopolized;
+                        resultBean.assetLocationId = assertItemBean.assetLocationId;
+                        resultBean.assetLocationName = assertItemBean.assetLocationName;
+                        resultBean.inDate = assertItemBean.inDate;
+                        resultBean.expireMonth = assertItemBean.expireMonth;
+
+                        detailsBean.result.add(resultBean);
                     }
                     mCheckDetailsBean = detailsBean;
                     String string = JsonParserUtil.serializeToJson(detailsBean);

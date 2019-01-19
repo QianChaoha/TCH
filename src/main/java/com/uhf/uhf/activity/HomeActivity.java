@@ -92,7 +92,7 @@ public class HomeActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet, R.id.btQun, R.id.tvSearchTag})
+    @OnClick({R.id.btSetting, R.id.btTagRw, R.id.btGet, R.id.btQun, R.id.tvSearchTag, R.id.systemSetting})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tvSearchTag:
@@ -119,6 +119,11 @@ public class HomeActivity extends BaseActivity {
                 OpenScanUtils.openScan(mActivity);
                 if (OpenTTFUtils.openUHF(mActivity)) {
                     OperateTagActivity.startOperateTagActivity(this);
+                }
+                break;
+            case R.id.systemSetting:
+                if (OpenTTFUtils.openUHF(mActivity)) {
+                    startActivity(new Intent(mActivity, SystemSettingActivity.class));
                 }
                 break;
         }

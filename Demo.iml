@@ -133,6 +133,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design-27.1.0" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:runtime-1.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:glide:3.5.2@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\work\cupper-android\personal\Demo\src\main\libs\jargs-1.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.yuzhiqiang1993:zxing-2.2.4" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />

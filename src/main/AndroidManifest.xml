@@ -130,6 +130,8 @@
         <activity android:name=".activity.GetPlanActivity" />
         <activity android:name=".activity.QunduActivity" />
         <activity android:name=".activity.SearchTagActivity" />
+        <activity android:name=".activity.SystemSettingActivity" />
+        <activity android:name=".activity.AssertDetailActivity" />
 
     </application>
 

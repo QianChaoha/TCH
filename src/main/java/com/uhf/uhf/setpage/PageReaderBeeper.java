@@ -22,6 +22,7 @@ import com.reader.helper.OperateTagBuffer;
 import com.reader.helper.ReaderHelper;
 import com.reader.helper.ReaderSetting;
 import com.uhf.uhf.LogList;
+import com.uhf.uhf.R;
 import com.uhf.uhf.R.id;
 import com.uhf.uhf.R.layout;
 import com.uhf.uhf.UHFApplication;
@@ -38,10 +39,7 @@ public class PageReaderBeeper extends BaseActivity {
 	private ReaderBase mReader;
 	
 	private static ReaderSetting m_curReaderSetting;
-    private static InventoryBuffer m_curInventoryBuffer;
-    private static OperateTagBuffer m_curOperateTagBuffer;
-    private static ISO180006BOperateTagBuffer m_curOperateTagISO18000Buffer;
-    
+
     private LocalBroadcastManager lbm;
     
     @Override
@@ -56,7 +54,7 @@ public class PageReaderBeeper extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(layout.page_reader_beeper);
+		setContentView(R.layout.page_reader_beeper);
 		((UHFApplication) getApplication()).addActivity(this);
 		
 		try {
@@ -68,9 +66,6 @@ public class PageReaderBeeper extends BaseActivity {
 		}
 		
 		m_curReaderSetting = mReaderHelper.getCurReaderSetting();
-		m_curInventoryBuffer = mReaderHelper.getCurInventoryBuffer();
-		m_curOperateTagBuffer = mReaderHelper.getCurOperateTagBuffer();
-		m_curOperateTagISO18000Buffer = mReaderHelper.getCurOperateTagISO18000Buffer();
 
 		mLogList = (LogList) findViewById(id.log_list);
 		mSet = (TextView) findViewById(id.set);

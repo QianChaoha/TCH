@@ -14,7 +14,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
+            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
+            android:paddingTop="5dp"
             android:text="No" />
 
         <View
@@ -27,7 +29,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="11"
+            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
+            android:paddingTop="5dp"
             android:text="EPC" />
 
         <View
@@ -40,9 +44,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0"
-            android:paddingRight="5dp"    android:visibility="gone"
             android:gravity="right"
-            android:text="次数" />
+            android:paddingRight="5dp"
+            android:text="次数"
+            android:visibility="gone" />
 
 
         <TextView
@@ -52,16 +57,19 @@
             android:layout_weight="0"
             android:gravity="right"
             android:paddingRight="5dp"
-            android:visibility="gone"
-            android:text="RSSI" />
+            android:text="RSSI"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/tvLocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
-            android:maxLines="2"
             android:gravity="right"
-            android:paddingRight="5dp"/>
+            android:maxLines="2"
+            android:paddingBottom="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp" />
     </LinearLayout>
 
     <View

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/title_layout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="资产编码:" />
+
+                <TextView
+                    android:id="@+id/tvAssertCode"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="资产名称:" />
+
+                <TextView
+                    android:id="@+id/tvAssertName"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="资产位置:" />
+
+                <TextView
+                    android:id="@+id/tvAssertLoc"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="单价(元):" />
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="供应商:" />
+
+                <TextView
+                    android:id="@+id/tvGys"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="入账日期:" />
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="生命周期:" />
+
+                <TextView
+                    android:id="@+id/tvLife"
+                    style="@style/TvRight" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/LlLayout">
+
+                <TextView
+                    style="@style/TvLeft"
+                    android:text="备注:" />
+
+                <TextView
+                    android:id="@+id/tvMark"
+                    style="@style/TvRight" />
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

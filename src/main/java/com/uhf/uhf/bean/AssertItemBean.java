@@ -1,12 +1,15 @@
 package com.uhf.uhf.bean;
 
+import java.io.Serializable;
+
 /**
  * Description:
  * Data: 2019/1/5
  *
  * @author: cqian
  */
-public class AssertItemBean {
+public class AssertItemBean implements Serializable{
+    private static final long serialVersionUID = 1L;
 
     public String epcData;
     public String count;
@@ -38,4 +41,15 @@ public class AssertItemBean {
         this.assetId = assetId;
         mAssetLocationName = assetLocationName;
     }
+
+    public String assetName;
+    public String imgPath;
+    public String note;
+    public String supplier;
+    public double price;
+    public boolean monopolized;
+    public int assetLocationId;
+    public String assetLocationName;
+    public String inDate;
+    public int expireMonth;
 }

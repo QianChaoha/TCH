@@ -123,7 +123,8 @@
                     android:paddingLeft="3.0dip"
                     android:text="修改密码"
                     android:textColor="#ff222222"
-                    android:textSize="9.5sp" />
+                    android:textSize="9.5sp"
+                    android:visibility="gone"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,7 +132,8 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/line"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <RadioGroup
                         android:id="@+id/group_access_area_type"
