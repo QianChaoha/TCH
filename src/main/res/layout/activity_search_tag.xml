@@ -93,7 +93,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@+id/tvLog"
-                android:text="未盘点"
+                android:text="未搜索"
                 android:textSize="18sp" />
 
 

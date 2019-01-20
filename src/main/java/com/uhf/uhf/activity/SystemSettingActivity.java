@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.com.tools.Beeper.mQuite;
+
 /**
  * Description:
  * Data: 2019/1/18
@@ -127,9 +129,11 @@ public class SystemSettingActivity extends BaseActivity {
                 switch (mRadioGroup.getCheckedRadioButtonId()) {
                     case R.id.rbOn:
                         btMode = 0;
+                        mQuite = false;
                         break;
                     case R.id.rbOff:
                         btMode = 1;
+                        mQuite = true;
                         break;
                 }
                 int i2 = mReader.setBeeperMode(m_curReaderSetting.btReadId, btMode);

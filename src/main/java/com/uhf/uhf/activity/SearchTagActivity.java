@@ -10,7 +10,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.com.tools.Beeper.BEEPER_SHORT;
 import static com.uhf.uhf.activity.HomeActivity.CLEAN_DATA_TIME;
 
 /**
@@ -130,6 +133,7 @@ public class SearchTagActivity extends BaseActivity {
 
     @OnClick({R.id.btPd, R.id.tvAddSearch})
     public void click(View view) {
+        clearAllFocus();
         switch (view.getId()) {
             case R.id.btPd:
                 startstop();
@@ -292,6 +296,7 @@ public class SearchTagActivity extends BaseActivity {
                                 temp = true;
                                 if (mCurrentSearchTxt.equals(inventoryTagMap.strEPC.replace(" ", ""))) {
                                     mDatas.get(i).state = 2;
+                                    Beeper.beep(BEEPER_SHORT);
                                 } else {
                                     mDatas.get(i).state = 0;
                                 }
@@ -331,9 +336,43 @@ public class SearchTagActivity extends BaseActivity {
         mHandler.removeCallbacks(mRefreshRunnable);
 
 
-        Beeper.release();
-
         ModuleManager.newInstance().setUHFStatus(false);
+    }
+    private void clearAllFocus() {
+        etSearchText.clearFocus();
+    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                View v = getCurrentFocus();
+                if (isShouldHideInput(v, ev)) {
+
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+                return super.dispatchTouchEvent(ev);
+
+        }
+        // 必不可少，否则所有的组件都不会有TouchEvent了
+        return super.dispatchTouchEvent(ev);
+    }
+
+    public boolean isShouldHideInput(View v, MotionEvent event) {
+        if (v != null && (v instanceof EditText)) {
+            int[] leftTop = {0, 0};
+            //获取输入框当前的location位置
+            v.getLocationInWindow(leftTop);
+            int left = leftTop[0];
+            int top = leftTop[1];
+            int bottom = top + v.getHeight();
+            int right = left + v.getWidth();
+            return !(event.getRawX() > left) || !(event.getRawX() < right)
+                    || !(event.getY() > top) || !(event.getY() < bottom);
+        }
+        return false;
     }
 
     @Override

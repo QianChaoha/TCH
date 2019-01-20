@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.com.tools.Beeper;
 import com.example.administrator.baselib.base.BaseActivity;
 import com.nativec.tools.ModuleManager;
 import com.nativec.tools.SerialPort;
@@ -132,6 +133,8 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ModuleManager.newInstance().setUHFStatus(false);
+        ModuleManager.newInstance().setScanStatus(false);
         getApplication().onTerminate();
     }
 }

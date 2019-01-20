@@ -45,6 +45,8 @@ import com.uhf.uhf.util.FourUtils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.com.tools.Beeper.BEEPER_SHORT;
+
 
 /**
  * Description:
@@ -99,7 +101,7 @@ public class OperateTagActivity extends BaseActivity {
             mLoopHandler.postDelayed(this, 2000);
         }
     };
-    boolean mNotBrocestEpc;
+    boolean mNotBrocestEpc, topRead = true;
     private Handler mUpdateViewHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -122,7 +124,6 @@ public class OperateTagActivity extends BaseActivity {
         public void run() {
             refreshList();
             mHandler.postDelayed(this, 2000);
-
         }
     };
 
@@ -314,6 +315,7 @@ public class OperateTagActivity extends BaseActivity {
     private View.OnClickListener setAccessOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
+            clearAllFocus();
             switch (arg0.getId()) {
                 case R.id.read:
                     //operateData(mPasswordEditText.getText().toString().toUpperCase(), 1, "");
@@ -322,7 +324,10 @@ public class OperateTagActivity extends BaseActivity {
                     setBtState(R.id.read, R.id.codeRead);
                     break;
                 case R.id.codeRead:
+                    topRead = true;
                     setBtState(R.id.codeRead, R.id.read);
+                    findViewById(R.id.codeReadBroad).setBackgroundResource(R.drawable.button_disenabled_background);
+
                     break;
                 case R.id.write: {
                     operateData(mStartAddrEditText.getText().toString(), mDataLenEditText.getText().toString(), mPasswordEditText.getText().toString().toUpperCase(), 2, mDataEditText.getText().toString().toUpperCase());
@@ -348,11 +353,24 @@ public class OperateTagActivity extends BaseActivity {
                     setBtState(R.id.readBroad, R.id.codeReadBroad);
                     break;
                 case R.id.codeReadBroad:
+                    topRead = false;
                     setBtState(R.id.codeReadBroad, R.id.readBroad);
+                    findViewById(R.id.codeRead).setBackgroundResource(R.drawable.button_disenabled_background);
+
                     break;
             }
         }
     };
+
+    private void clearAllFocus() {
+        mDataEditText.clearFocus();
+        mCodeText.clearFocus();
+        mCodeTextBroad.clearFocus();
+        mStartAddrEditText.clearFocus();
+        mDataLenEditText.clearFocus();
+        mPasswordEditText.clearFocus();
+        mPasswordBottom.clearFocus();
+    }
 
     private void setBtState(int enableId, int disableId) {
         findViewById(enableId).setBackgroundResource(R.drawable.button_press_background);
@@ -584,7 +602,13 @@ public class OperateTagActivity extends BaseActivity {
             } else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
                 if (m_curOperateBinDCodeTagbuffer.getIsTagList() != null && m_curOperateBinDCodeTagbuffer.getIsTagList().size() > 0) {
-                    mCodeText.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
+                    if (topRead){
+                        mCodeText.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
+                    }else {
+                        mCodeTextBroad.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
+                    }
+                    clearAllFocus();
+                    hideInput(getWindow().getDecorView());
                 }
             }
         }
@@ -597,7 +621,9 @@ public class OperateTagActivity extends BaseActivity {
         SimpleDateFormat temp = new SimpleDateFormat("kk:mm:ss");
         mLogList.setText(temp.format(now) + ": " + log);
         mLogList.setTextColor(type == ERROR.SUCCESS ? Color.BLACK : Color.RED);
+
         if (type == ERROR.SUCCESS && "写标签".equals(log)) {
+            Beeper.beep(BEEPER_SHORT);
             Toast.makeText(mContext, "写入成功", Toast.LENGTH_SHORT).show();
         }
     }
@@ -612,17 +638,20 @@ public class OperateTagActivity extends BaseActivity {
             case MotionEvent.ACTION_DOWN:
                 View v = getCurrentFocus();
                 if (isShouldHideInput(v, ev)) {
-
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
+                    hideInput(v);
                 }
                 return super.dispatchTouchEvent(ev);
 
         }
         // 必不可少，否则所有的组件都不会有TouchEvent了
         return super.dispatchTouchEvent(ev);
+    }
+
+    private void hideInput(View v) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
     }
 
     public boolean isShouldHideInput(View v, MotionEvent event) {
@@ -651,8 +680,6 @@ public class OperateTagActivity extends BaseActivity {
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
 
-
-        Beeper.release();
 
         ModuleManager.newInstance().setUHFStatus(false);
         ModuleManager.newInstance().setScanStatus(false);

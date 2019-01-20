@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.com.tools.Beeper.BEEPER_SHORT;
+
 /**
  * Description:
  * Data: 2018/12/28
@@ -514,6 +516,9 @@ public class SettingActivity extends BaseActivity {
 
     private void refreshList() {
         mTagAccessList.refreshList();
+        if (mTagAccessList.data!=null && mTagAccessList.data.size()>0){
+            Beeper.beep(BEEPER_SHORT);
+        }
     }
 
     private void refreshText() {
@@ -624,8 +629,6 @@ public class SettingActivity extends BaseActivity {
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
 
-
-        Beeper.release();
 
         ModuleManager.newInstance().setUHFStatus(false);
         ModuleManager.newInstance().setScanStatus(false);

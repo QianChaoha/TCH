@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.com.tools.Beeper.BeepMode.BEEP_PER_TAG;
+
 public class UHFApplication extends Application {
 
     //add by lei.li 2016/11/12
@@ -65,6 +67,7 @@ public class UHFApplication extends Application {
 
         mContext = getApplicationContext();
         Beeper.init(mContext);
+        Beeper.setBeepMode(BEEP_PER_TAG);
         HttpUtils.init(getContext());
 		/*CrashHandler crashHandler = CrashHandler.getInstance();
 		crashHandler.init(getApplicationContext());*/

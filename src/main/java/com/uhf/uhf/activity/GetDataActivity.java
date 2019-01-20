@@ -54,6 +54,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.com.tools.Beeper.BEEPER_SHORT;
 import static com.uhf.uhf.activity.HomeActivity.CLEAN_DATA_TIME;
 import static com.uhf.uhf.util.SharedPreferencesUtils.GET_PAN_DATA;
 
@@ -575,6 +576,7 @@ public class GetDataActivity extends BaseActivity {
                     }
 
                 }
+                Beeper.beep(BEEPER_SHORT);
             }
         }
 //        else if (mTagAccessList.data != null && mTagAccessList.data.size() > 0){
@@ -587,7 +589,6 @@ public class GetDataActivity extends BaseActivity {
 //            }
 //
 //        }
-
         mGetPanAdapter.notifyDataSetChanged();
 
     }
@@ -613,8 +614,6 @@ public class GetDataActivity extends BaseActivity {
         mLoopHandler.removeCallbacks(mLoopRunnable);
         mHandler.removeCallbacks(mRefreshRunnable);
 
-
-        Beeper.release();
 
         ModuleManager.newInstance().setUHFStatus(false);
     }

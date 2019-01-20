@@ -14,7 +14,7 @@ import com.uhf.uhf.R;
 public class Beeper {
     public static final int BEEPER = 1;
     public static final int BEEPER_SHORT = 2;
-    private static boolean mQuite = false;
+    public static boolean mQuite = false;
     private static boolean mBeepInventoried = false;
     private static boolean mBeepPerTag = false;
     private static final SoundPool mSoundPool = new SoundPool(1, AudioManager.STREAM_MUSIC,5);
