@@ -102,7 +102,8 @@ public class QunduActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        new TopTitleUtils(this).setTitle("群读").setLeft(null);;
+        new TopTitleUtils(this).setTitle("群读").setLeft(null);
+        ;
         mGetPanAdapter = new QunAdapter(mActivity, mDatas);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mGetPanAdapter);
@@ -146,7 +147,7 @@ public class QunduActivity extends BaseActivity {
                             mGetPanAdapter.notifyDataSetChanged();
                         }
                     }, CLEAN_DATA_TIME);
-                }else {
+                } else {
                     mDatas.clear();
                     mGetPanAdapter.notifyDataSetChanged();
                 }
@@ -288,6 +289,9 @@ public class QunduActivity extends BaseActivity {
 
     private void refreshList() {
         //可以得出盘点到和盘盈的数据
+        if (isDestroyed() || mTagAccessList == null) {
+            return;
+        }
         mTagAccessList.refreshList();
         if (mDatas != null) {
             if (mTagAccessList.data != null && mTagAccessList.data.size() > 0) {
@@ -310,9 +314,9 @@ public class QunduActivity extends BaseActivity {
                     }
                 }
             }
-        }
-        if (mDatas.size()>0){
-            Beeper.beep(BEEPER_SHORT);
+            if (mDatas.size() > 0) {
+                Beeper.beep(BEEPER_SHORT);
+            }
         }
         mGetPanAdapter.notifyDataSetChanged();
 

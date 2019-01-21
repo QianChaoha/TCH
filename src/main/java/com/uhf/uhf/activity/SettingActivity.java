@@ -92,7 +92,7 @@ public class SettingActivity extends BaseActivity {
     private Runnable mLoopRunnable = new Runnable() {
         public void run() {
             mReaderHelper.runLoopInventroy();
-            mLoopHandler.postDelayed(this, 2000);
+            mLoopHandler.postDelayed(this, 100);
         }
     };
     boolean mNotBrocestEpc;
@@ -110,7 +110,7 @@ public class SettingActivity extends BaseActivity {
     private Runnable mRefreshRunnable = new Runnable() {
         public void run() {
             refreshList();
-            mHandler.postDelayed(this, 2000);
+            mHandler.postDelayed(this, 100);
 
         }
     };
@@ -338,9 +338,9 @@ public class SettingActivity extends BaseActivity {
         m_curReaderSetting.btWorkAntenna = btWorkAntenna;
         refreshStartStop(true);
         mLoopHandler.removeCallbacks(mLoopRunnable);
-        mLoopHandler.postDelayed(mLoopRunnable, 2000);
+        mLoopHandler.postDelayed(mLoopRunnable, 10);
         mHandler.removeCallbacks(mRefreshRunnable);
-        mHandler.postDelayed(mRefreshRunnable, 2000);
+        mHandler.postDelayed(mRefreshRunnable, 10);
     }
 
     private void refreshStartStop(boolean start) {
@@ -515,6 +515,9 @@ public class SettingActivity extends BaseActivity {
     };
 
     private void refreshList() {
+        if (isDestroyed() || mTagAccessList == null) {
+            return;
+        }
         mTagAccessList.refreshList();
         if (mTagAccessList.data!=null && mTagAccessList.data.size()>0){
             Beeper.beep(BEEPER_SHORT);

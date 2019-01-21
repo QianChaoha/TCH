@@ -278,6 +278,9 @@ public class SearchTagActivity extends BaseActivity {
     };
 
     private void refreshList() {
+        if (isDestroyed() || mTagAccessList == null) {
+            return;
+        }
         //可以得出盘点到和盘盈的数据
         if (mTagAccessList == null) return;
         mTagAccessList.refreshList();

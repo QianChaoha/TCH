@@ -524,6 +524,9 @@ public class OperateTagActivity extends BaseActivity {
 
     private void refreshList() {
         mTagAccessList.refreshList();
+        if (mTagAccessList.data != null && mTagAccessList.data.size() > 0) {
+            Beeper.beep(BEEPER_SHORT);
+        }
     }
 
     private void refreshText() {
@@ -602,11 +605,12 @@ public class OperateTagActivity extends BaseActivity {
             } else if (intent.getAction().equals(
                     CodeReaderHelper.BROADCAST_REFRESH_BAR_CODE)) {
                 if (m_curOperateBinDCodeTagbuffer.getIsTagList() != null && m_curOperateBinDCodeTagbuffer.getIsTagList().size() > 0) {
-                    if (topRead){
+                    if (topRead) {
                         mCodeText.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
-                    }else {
+                    } else {
                         mCodeTextBroad.setText(m_curOperateBinDCodeTagbuffer.getIsTagList().get(0).mBarCodeValue);
                     }
+                    Beeper.beep(BEEPER_SHORT);
                     clearAllFocus();
                     hideInput(getWindow().getDecorView());
                 }

@@ -182,7 +182,11 @@ public class SystemSettingActivity extends BaseActivity {
 
                 if (btCmd == CMD.GET_OUTPUT_POWER || btCmd == CMD.SET_OUTPUT_POWER) {
                     if (m_curReaderSetting.btAryOutputPower != null) {
-                        mTagAccessListText.setText(String.valueOf(m_curReaderSetting.btAryOutputPower[0] & 0xFF));
+                        String text=String.valueOf(m_curReaderSetting.btAryOutputPower[0] & 0xFF);
+                        if (mList.contains(text)){
+                            mPos=mList.indexOf(text);
+                        }
+                        mTagAccessListText.setText(text);
                     }
                 }
                 if (btCmd == CMD.GET_READER_TEMPERATURE) {
@@ -235,6 +239,7 @@ public class SystemSettingActivity extends BaseActivity {
                         mHashMap.put("射频频谱", "Tari 6.25uS; FM0 400KHz");
                     }
                     Iterator iter = mHashMap.entrySet().iterator();
+                    mLlBottom.removeAllViews();
                     while (iter.hasNext()) {
                         Map.Entry<String, String> entry = (Map.Entry) iter.next();
                         if (!TextUtils.isEmpty(entry.getKey()) && !TextUtils.isEmpty(entry.getValue())) {
