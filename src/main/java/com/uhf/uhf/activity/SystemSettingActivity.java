@@ -65,7 +65,7 @@ public class SystemSettingActivity extends BaseActivity {
     @Override
     protected void initView() {
         new TopTitleUtils(this).setTitle("系统设置");
-        for (int i = 5; i <= 30; i = i + 5) {
+        for (int i = 5; i <= 30; i++) {
             mList.add(i + "");
         }
 
@@ -182,9 +182,9 @@ public class SystemSettingActivity extends BaseActivity {
 
                 if (btCmd == CMD.GET_OUTPUT_POWER || btCmd == CMD.SET_OUTPUT_POWER) {
                     if (m_curReaderSetting.btAryOutputPower != null) {
-                        String text=String.valueOf(m_curReaderSetting.btAryOutputPower[0] & 0xFF);
-                        if (mList.contains(text)){
-                            mPos=mList.indexOf(text);
+                        String text = String.valueOf(m_curReaderSetting.btAryOutputPower[0] & 0xFF);
+                        if (mList.contains(text)) {
+                            mPos = mList.indexOf(text);
                         }
                         mTagAccessListText.setText(text);
                     }

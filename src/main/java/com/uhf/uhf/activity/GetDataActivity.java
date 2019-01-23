@@ -199,9 +199,11 @@ public class GetDataActivity extends BaseActivity {
         mGetPanAdapter.setOnItemClickLitener(new BaseViewHolder.onItemCommonClickListener() {
             @Override
             public void onItemClickListener(View view, int position) {
-                Intent intent = new Intent(mActivity, AssertDetailActivity.class);
-                intent.putExtra("data",mDatas.get(position));
-                startActivity(intent);
+                if (mDatas.get(position) != null && mDatas.get(position).state != 2) {
+                    Intent intent = new Intent(mActivity, AssertDetailActivity.class);
+                    intent.putExtra("data", mDatas.get(position));
+                    startActivity(intent);
+                }
             }
         });
 

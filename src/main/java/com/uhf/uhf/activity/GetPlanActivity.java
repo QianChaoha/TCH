@@ -182,6 +182,8 @@ public class GetPlanActivity extends BaseActivity {
                 if (data != null && data.result != null && data.result.size() > 0) {
                     result.addAll(data.result);
                     mMyAdapter.notifyDataSetChanged();
+                }else{
+                    Toast.makeText(mActivity, "没有盘点任务", Toast.LENGTH_SHORT).show();
                 }
             }
 
